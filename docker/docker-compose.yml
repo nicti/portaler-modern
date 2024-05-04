@@ -6,8 +6,6 @@ services:
     env_file:
       - .env.example
     restart: unless-stopped
-    ports:
-      - '5432:5432'
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
@@ -17,8 +15,6 @@ services:
     env_file:
       - .env.example
     restart: unless-stopped
-    ports:
-      - '6379:6379'
     networks:
       - portaler
   portaler-ts-backend:
