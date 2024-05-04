@@ -7,7 +7,7 @@ services:
       - .env.example
     restart: unless-stopped
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - ./db_data:/var/lib/postgresql/data
     networks:
       - portaler
   rediscache:
@@ -33,6 +33,3 @@ services:
 networks:
   portaler:
     driver: 'bridge'
-
-volumes:
-  db_data: {}
