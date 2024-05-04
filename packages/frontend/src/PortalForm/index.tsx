@@ -256,17 +256,6 @@ const MappingBar = () => {
             zoneList={filteredTo}
           />
         </div>
-        <div className={cn(styles.row, styles.portalSize)}>
-          <FormLabel
-            error={!!sizeError}
-            component="legend"
-            className={styles.sizePad}
-          >
-            Size {!!sizeError && `(${sizeError})`}
-          </FormLabel>
-
-          <PortalSizeSelector size={portalSize} update={setPortalSize} />
-        </div>
         <div className={styles.row}>
           <FormControl fullWidth component="fieldset">
             <FormLabel component="legend">Time Left</FormLabel>
@@ -278,7 +267,7 @@ const MappingBar = () => {
                 id="time-hour"
                 className={cn(styles.durationField, {
                   [styles.disabled]:
-                    portalSize === 'royal' || portalSize === 'const',
+                  portalSize === 'royal' || portalSize === 'const',
                 })}
                 type="number"
                 label="Hour(s)"
@@ -295,7 +284,7 @@ const MappingBar = () => {
                 id="time-minute"
                 className={cn(styles.durationField, {
                   [styles.disabled]:
-                    portalSize === 'royal' || portalSize === 'const',
+                  portalSize === 'royal' || portalSize === 'const',
                 })}
                 type="number"
                 label="Minute(s)"
@@ -310,6 +299,17 @@ const MappingBar = () => {
               />
             </div>
           </FormControl>
+        </div>
+        <div className={cn(styles.row, styles.portalSize)}>
+          <FormLabel
+            error={!!sizeError}
+            component="legend"
+            className={styles.sizePad}
+          >
+            Size {!!sizeError && `(${sizeError})`}
+          </FormLabel>
+
+          <PortalSizeSelector size={portalSize} update={setPortalSize} />
         </div>
         <div className={styles.row}>
           <FormControl fullWidth>
