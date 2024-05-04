@@ -23,7 +23,7 @@ services:
       - .env.example
     restart: unless-stopped
     ports:
-      - '7777:4242'
+      - '127.0.0.1:7777:4242'
     depends_on:
       - pgdb
       - rediscache
