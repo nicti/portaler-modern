@@ -267,7 +267,7 @@ const MappingBar = () => {
                 id="time-hour"
                 className={cn(styles.durationField, {
                   [styles.disabled]:
-                  portalSize === 'royal' || portalSize === 'const',
+                    portalSize === 'royal' || portalSize === 'const',
                 })}
                 type="number"
                 label="Hour(s)"
@@ -284,7 +284,7 @@ const MappingBar = () => {
                 id="time-minute"
                 className={cn(styles.durationField, {
                   [styles.disabled]:
-                  portalSize === 'royal' || portalSize === 'const',
+                    portalSize === 'royal' || portalSize === 'const',
                 })}
                 type="number"
                 label="Minute(s)"
