@@ -26,8 +26,8 @@ const useGetZones = () => {
       })
     } else if (!loadedState && config.token) {
       hasHydrated.current = true
-
-      fetchler.get('/api/zone/list').then((json) => {
+      const baseUrl = process.env.REACT_APP_API_URL || ''
+      fetchler.get(`${baseUrl}/api/zone/list`).then((json) => {
         dispatch({ type: ZoneActionTypes.ADD, zones: json as Zone[] })
       })
     }

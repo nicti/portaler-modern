@@ -70,7 +70,10 @@ interface PortalSizeSelectorProps {
   update: (size: PortalSize) => void
 }
 
-const PortalSizeSelector: FC<PortalSizeSelectorProps> = ({ size, update }) => {
+const PortalSizeSelector: FC<PortalSizeSelectorProps> = ({
+  size = 'blue',
+  update,
+}) => {
   const handleClick = useCallback(
     (val: string) => {
       update(val as PortalSize)

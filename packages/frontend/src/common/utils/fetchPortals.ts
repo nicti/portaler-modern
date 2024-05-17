@@ -7,8 +7,8 @@ const fetchPortals = async (config: ConfigState): Promise<Portal[]> => {
   if (!config.token) {
     return Promise.resolve([])
   }
-
-  return await fetchler.get<Portal[]>(`/api/portal`)
+  const baseUrl = process.env.REACT_APP_API_URL || ''
+  return await fetchler.get<Portal[]>(`${baseUrl}/api/portal`)
 }
 
 export default fetchPortals

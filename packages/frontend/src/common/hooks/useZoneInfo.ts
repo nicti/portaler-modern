@@ -22,7 +22,8 @@ const useZoneInfo = (): Zone | null => {
         newZone = zoneList.find((z) => z.id === id) ?? null
 
         if (!newZone?.info?.markers) {
-          const zoneInfo = await fetchler.get(`/api/zone/info/${id}`)
+          const baseUrl = process.env.REACT_APP_API_URL || ''
+          const zoneInfo = await fetchler.get(`${baseUrl}/api/zone/info/${id}`)
 
           dispatch({ type: ZoneActionTypes.ADD_INFO, zoneInfo })
         }

@@ -39,7 +39,19 @@ const discordBotPerms = '268435456'
 
 const config: IConfig = {
   cors: {
-    origin: regex,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true)
+      if (
+        process.env.NODE_ENV !== 'production' &&
+        origin === 'http://localhost:3000'
+      ) {
+        return callback(null, true)
+      }
+      if (regex.test(origin)) {
+        return callback(null, true)
+      }
+      return callback(new Error('Not allowed by CORS'))
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   },

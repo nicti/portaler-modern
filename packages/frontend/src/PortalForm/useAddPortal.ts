@@ -9,7 +9,8 @@ const useAddPortal = () => {
   const checkPortals = useGetPortals()
   return useCallback(
     async (portal: PortalPayload) => {
-      await fetchler.post('/api/portal', { ...portal })
+      const baseUrl = process.env.REACT_APP_API_URL || ''
+      await fetchler.post(`${baseUrl}/api/portal`, { ...portal })
 
       await checkPortals(true)
     },

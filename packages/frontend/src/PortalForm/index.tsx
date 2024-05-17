@@ -89,7 +89,7 @@ const MappingBar = () => {
   const oldTime = useRef<number | null>(0)
   const [from, setFrom] = useState<Zone>(DEFAULT_ZONE)
   const [to, setTo] = useState<Zone>(DEFAULT_ZONE)
-  const [portalSize, setPortalSize] = useState<PortalSize | null>(null)
+  const [portalSize, setPortalSize] = useState<PortalSize | null>('blue')
   const [hours, setHours] = useState<number | null>(null)
   const [minutes, setMinutes] = useState<number | null>(null)
   const [errors, setErrors] = useState<InputError[]>([])

@@ -15,7 +15,8 @@ const useDeleteZone = () => {
       const portalIds = edgeData.map((e) => e.portalId)
 
       try {
-        await fetchler.del('/api/portal', {
+        const baseUrl = process.env.REACT_APP_API_URL || ''
+        await fetchler.del(`${baseUrl}/api/portal`, {
           portals: portalIds,
         })
         checkPortals(true)

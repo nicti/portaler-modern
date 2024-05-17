@@ -37,8 +37,8 @@ const DeleteNode: FC<DeleteNodeProps> = ({ edgeData, zoneName }) => {
     <div className={styles.control}>
       <IconButton
         onClick={() => setIsOpen(true)}
-        aria-label="home"
-        title="focus home"
+        aria-label="delete"
+        title="delete"
       >
         <DeleteIcon fontSize="large" color="secondary" />
       </IconButton>
@@ -48,11 +48,10 @@ const DeleteNode: FC<DeleteNodeProps> = ({ edgeData, zoneName }) => {
         aria-labelledby="alert-dialog-title"
       >
         <DialogTitle id="alert-dialog-title">
-          {(edgeData[0] as any).portalName
-            ? `Are you sure you want to to delete this portal - "${
-                (edgeData[0] as any).portalName
-              }"?`
-            : `Are you sure you want to delete this "${zoneName}" its connections?`}
+          {`Are you sure you want to delete zone "${zoneName}" and its following connections?`}
+          {edgeData.map((c: any) => (
+            <li>{c.portalName}</li>
+          ))}
         </DialogTitle>
         <DialogActions>
           <Button
