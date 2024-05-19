@@ -16,6 +16,7 @@ const calculateWorldMapping = (fileData: FullZone[]) => {
   )
   // bz nodes
   bzData.forEach((item: FullZone) => {
+    // @ts-ignore
     bzGraph.addNode(item.displayname)
     if (Array.isArray(item.exits?.exit)) {
       item.exits?.exit.forEach((exit) => {
@@ -32,6 +33,7 @@ const calculateWorldMapping = (fileData: FullZone[]) => {
           return
         }
         try {
+          // @ts-ignore
           bzGraph.addEdge(item.displayname, target)
         } catch (UsageGraphError) {
           console.log('Error adding edge', item.displayname, target)
