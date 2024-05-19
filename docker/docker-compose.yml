@@ -18,7 +18,9 @@ services:
     networks:
       - portaler
   portaler-ts-backend:
-    image: aut1sto/portaler-ts:latest
+    build:
+        context: .
+        dockerfile: portaler.dockerfile
     env_file:
       - .env.example
     restart: unless-stopped
