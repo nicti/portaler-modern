@@ -123,11 +123,18 @@ export const getZoneMeta = async (id: number): Promise<Zone> => {
       })
     )
 
+    let shortestPath: any = await redis.getShortestPaths()
+    if (shortestPath) {
+      shortestPath = JSON.parse(shortestPath)
+      shortestPath = shortestPath[zone.name] ?? {}
+    }
+
     zone.info = {
       markers: markersData,
       resources: resourcesData,
       mobs: mobsData,
       royalConnections: connData,
+      shortestPath: shortestPath,
     }
 
     await redis.setZone(zone)

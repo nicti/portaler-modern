@@ -70,6 +70,13 @@ export default class RedisConnector {
 
   getZones = async () => await this.getAsync('zones')
 
+  setShortestPaths = async (paths: any[]) => {
+    await this.delAsync('shortestPaths')
+    return await this.setAsync('shortestPaths', JSON.stringify(paths))
+  }
+
+  getShortestPaths = async () => await this.getAsync('shortestPaths')
+
   setZone = async (zone: Zone) =>
     await this.setAsync(`zone:${zone.id}`, JSON.stringify(zone), 'EX', 7200)
 

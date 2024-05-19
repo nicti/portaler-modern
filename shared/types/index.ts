@@ -50,11 +50,13 @@ export interface ZoneInfo {
   mobs?: Mob[]
   royalConnections?: ZoneLite[]
   miniMapUrl?: string
+  shortestPath?: any[]
 }
 
 export interface Zone extends ZoneLite {
   albionId?: string
   info?: ZoneInfo
+  shortestPaths?: any
 }
 
 export interface PortalPayload {

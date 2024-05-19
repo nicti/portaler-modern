@@ -72,12 +72,14 @@ const MapSearch = () => {
   const [markers, setMarkers] = useState<string[]>([])
   const [resources, setResources] = useState<string[]>([])
   const [mobs, setMobs] = useState<string[]>([])
+  const [paths, setPaths] = useState<any | undefined>([])
 
   useEffect(() => {
     if (zone?.info) {
       setMarkers(markerCounter(zone?.info?.markers))
       setResources(infoCounter(zone?.info?.resources))
       setMobs(infoCounter(zone?.info?.mobs))
+      setPaths(zone?.info?.shortestPath)
     }
   }, [zone])
 
@@ -127,6 +129,23 @@ const MapSearch = () => {
             <li className={styles.infoList}>{m}</li>
           ))}
         </ul>
+      </div>
+      <div
+        className={cn(styles.infoRow, {
+          [styles.hide]: !paths.hasOwnProperty('distance'),
+        })}
+      >
+        <h3>Shortest Paths ({paths.distance}):</h3>
+        {paths.portals?.map((route: string[]) => (
+          <div>
+            <h4 style={{ marginBottom: 0 }}>To {route[route.length - 1]}</h4>
+            <ul style={{ marginTop: 0 }}>
+              {route.map((m: string) => (
+                <li>{m}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
     </div>
   )

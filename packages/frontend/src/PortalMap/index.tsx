@@ -196,9 +196,14 @@ const PortalMap = () => {
           const imgUrl = z.tier ? tiers[z.tier as ZoneTier] : null
           const backgroundUrl = imgUrl ? `url(${imgUrl})` : 'none'
 
-          const label = z.type.startsWith('TUNNEL')
-            ? `${z.name} (${callSign(z)})`
-            : z.name
+          let label: string = ''
+          if (z.type.startsWith('TUNNEL')) {
+            label = `${z.name} (${callSign(z)})`
+          } else if (z.type.startsWith('OPENPVP_BLACK')) {
+            label = `${z.name} (${z.shortestPaths.distance})`
+          } else {
+            label = z.name
+          }
 
           elms.set(id, {
             added: false,

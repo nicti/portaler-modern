@@ -9,4 +9,5 @@ export const DEFAULT_ZONE: Zone = {
   tier: '',
   color: 'black',
   type: '',
+  shortestPaths: {},
 }

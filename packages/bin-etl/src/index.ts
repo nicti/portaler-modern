@@ -7,6 +7,7 @@ import getDb, { db, redis } from './db'
 import FullZone from './FullZone'
 import getNewFile from './getNewFile'
 import worldProcess from './worldProcess'
+import calculateWorldMapping from './calculateWorldMapping'
 
 const timer = 3600 * 12 * 1000 // 12hrs
 
@@ -43,6 +44,8 @@ const fileGetter = async () => {
   }))
 
   await redis.setZones(zoneList)
+
+  calculateWorldMapping(fileData)
 }
 ;(async () => {
   await getDb()
