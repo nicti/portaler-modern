@@ -35,7 +35,7 @@ export const getZoneColor = (
     case 'city':
       return '#42a5f5'
     case 'city-black':
-      return '#1b1a29'
+      return '#140c7c'
     default:
       return '#15ff00'
   }

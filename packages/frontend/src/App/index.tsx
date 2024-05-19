@@ -3,7 +3,6 @@ import React from 'react'
 import { CssBaseline, ThemeProvider } from '@material-ui/core'
 
 import SideBar from '../Sidebar'
-import Footer from './Footer'
 import useGetPortalTimer from './hooks/useGetPortalTimer'
 import useGetZones from './hooks/useGetZones'
 import useSetToken from './hooks/useSetToken'
@@ -27,7 +26,6 @@ const App = () => {
           <SideBar />
           <MapArea />
         </MainLayout>
-        <Footer />
       </div>
     </ThemeProvider>
   )
