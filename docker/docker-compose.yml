@@ -19,8 +19,8 @@ services:
       - portaler
   portaler-ts-backend:
     build:
-        context: .
-        dockerfile: portaler.dockerfile
+        context: ../
+        dockerfile: docker/portaler.dockerfile
     env_file:
       - .env.example
     restart: unless-stopped
