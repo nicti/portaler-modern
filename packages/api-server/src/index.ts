@@ -31,7 +31,6 @@ const app = express()
   // app.use('/api/user_info', User)
 
   app.use(bodyParser.json())
-  app.use(express.json())
   app.use(cookieParser())
   app.use(compression())
 
@@ -41,6 +40,9 @@ const app = express()
   // Un-authed routes
   app.use('/api/auth', Auth)
   app.get('/api/health', (_, res) => res.status(200).send({ server: 'ok' }))
+  app.post('/api/health', (_, res) =>
+    res.status(200).send({ server: 'ok', body: _.body })
+  )
   app.get('/api/bot', (_, res) => res.redirect(config.discord.botUrl))
   app.use('/api/zone', Zone)
 
