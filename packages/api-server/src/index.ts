@@ -16,6 +16,8 @@ import verifyUser from './middleware/verifyUser'
 import config from './utils/config'
 import logger from './utils/logger'
 import User from './api/user'
+import Portals from './api/portal'
+import UsersInfo from './api/user'
 
 const app = express()
 
@@ -48,7 +50,8 @@ const app = express()
   app.use('/api/zone', Zone)
 
   // Authed routes
-  app.use('/api', verifyUser, Api)
+  app.use('/api/portal', verifyUser, Portals)
+  app.use('/api/user_info', verifyUser, UsersInfo)
 
   app.listen(config.port, () => logger.info(`Started: ${config.port}`))
 })()
