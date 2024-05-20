@@ -1,5 +1,6 @@
 import 'dotenv/config'
 
+import bodyParser from 'body-parser'
 import compression from 'compression'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
@@ -30,8 +31,7 @@ const app = express()
   // })
   // app.use('/api/user_info', User)
 
-  app.use(express.json())
-  app.use(express.urlencoded({ extended: true }))
+  app.use(bodyParser.json())
   app.use(cookieParser())
   app.use(compression())
 

@@ -76,7 +76,7 @@ router.post('/', async (req, res) => {
     const body: PortalPayload = req.body
 
     if (body === undefined) {
-      return res.status(500).send('No body provided')
+      return res.status(500).send('No payload provided')
     }
 
     const expires = getExpireTime(body.size, body.hours, body.minutes)

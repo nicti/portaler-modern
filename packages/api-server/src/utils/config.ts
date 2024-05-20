@@ -42,7 +42,7 @@ const config: IConfig = {
     origin: function (origin, callback) {
       if (!origin) return callback(null, true)
       if (
-        process.env.NODE_ENV !== 'production' &&
+        process.env.NODE_ENV === 'development' &&
         origin === 'http://localhost:3000'
       ) {
         return callback(null, true)
