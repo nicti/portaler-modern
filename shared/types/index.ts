@@ -102,6 +102,7 @@ export interface RedisConfig {
   host: string
   password: string
   port: number
+  db: number
 }
 
 export interface IZoneModel {
