@@ -36,7 +36,7 @@ portalerApi.interceptors.response.use(
     } else {
       store.dispatch({
         type: ErrorActionTypes.ADD,
-        error: `Error ${error.response.status}`,
+        error: `Error ${error.response.status}: ${error.response.data}`,
       })
     }
     return Promise.reject(error)

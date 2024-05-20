@@ -27,6 +27,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt update && \
     apt -qy full-upgrade && \
     apt -qy install sudo && \
+    apt -qy install nano && \
     apt install -qy curl && \
     curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
     apt install -y nodejs && \
