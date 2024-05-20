@@ -27,7 +27,7 @@ const portalerFetchler = new Fetchler(opts)*/
 
 const portalerApi = axios.create({})
 
-axios.interceptors.request.use(
+portalerApi.interceptors.request.use(
   function (config) {
     const token = window.localStorage.getItem('token')
     if (config.headers === undefined) {
