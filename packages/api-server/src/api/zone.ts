@@ -3,6 +3,7 @@ import { Router } from 'express'
 import { getZoneMeta } from '../database/zones'
 import { redis } from '../utils/db'
 import logger from '../utils/logger'
+import { PortalPayload } from '@portaler/types'
 
 const router = Router()
 
@@ -41,6 +42,11 @@ router.get('/info/:id', async (req, res) => {
     })
     res.sendStatus(500)
   }
+})
+
+router.post('/test', async (req, res) => {
+  const body: PortalPayload = req.body
+  res.status(200).send(body)
 })
 
 export default router
