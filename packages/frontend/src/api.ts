@@ -5,26 +5,6 @@ import { ErrorActionTypes } from './reducers/errorReducer'
 import { PortalMapActionTypes } from './reducers/portalMapReducer'
 import store from './store'
 
-/*const opts: FetchlerOptions = {
-  token: tokenStore(),
-  handler401: () => {
-    store.dispatch({ type: ErrorActionTypes.ADD, error: 'Not Authorized' })
-    store.dispatch({ type: ConfigActionTypes.CLEARTOKEN })
-  },
-  handler403: () => {
-    store.dispatch({ type: ErrorActionTypes.ADD, error: 'Forbidden' })
-    store.dispatch({ type: ConfigActionTypes.CLEARTOKEN })
-    store.dispatch({ type: PortalMapActionTypes.CLEARALL })
-  },
-  handlerError: (res) =>
-    store.dispatch({
-      type: ErrorActionTypes.ADD,
-      error: `Error ${res?.status}`,
-    }),
-}
-
-const portalerFetchler = new Fetchler(opts)*/
-
 const portalerApi = axios.create({})
 
 portalerApi.interceptors.request.use(
@@ -46,6 +26,19 @@ portalerApi.interceptors.response.use(
     return response
   },
   function (error) {
+    if (error.response.status === 401) {
+      store.dispatch({ type: ErrorActionTypes.ADD, error: 'Not Authorized' })
+      store.dispatch({ type: ConfigActionTypes.CLEARTOKEN })
+    } else if (error.response.status === 403) {
+      store.dispatch({ type: ErrorActionTypes.ADD, error: 'Forbidden' })
+      store.dispatch({ type: ConfigActionTypes.CLEARTOKEN })
+      store.dispatch({ type: PortalMapActionTypes.CLEARALL })
+    } else {
+      store.dispatch({
+        type: ErrorActionTypes.ADD,
+        error: `Error ${error.response.status}`,
+      })
+    }
     return Promise.reject(error)
   }
 )
