@@ -41,4 +41,13 @@ portalerApi.interceptors.request.use(
   }
 )
 
+portalerApi.interceptors.response.use(
+  function (response) {
+    return response
+  },
+  function (error) {
+    return Promise.reject(error)
+  }
+)
+
 export default portalerApi
