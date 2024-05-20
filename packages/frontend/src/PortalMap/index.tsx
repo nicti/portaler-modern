@@ -200,7 +200,7 @@ const PortalMap = () => {
           if (z.type.startsWith('TUNNEL')) {
             label = `${z.name} (${callSign(z)})`
           } else if (z.type.startsWith('OPENPVP_BLACK')) {
-            label = `${z.name} (${z.shortestPaths.distance})`
+            label = `${z.name} (${z.shortestPaths.distance - 1})`
           } else {
             label = z.name
           }
