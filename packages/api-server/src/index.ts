@@ -1,12 +1,10 @@
 import 'dotenv/config'
 
-import bodyParser from 'body-parser'
 import compression from 'compression'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
 
-import Api from './api'
 import Auth from './api/auth'
 import Zone from './api/zone'
 import initServer from './initServer'

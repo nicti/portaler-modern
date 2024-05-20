@@ -44,9 +44,4 @@ router.get('/info/:id', async (req, res) => {
   }
 })
 
-router.post('/test', async (req, res) => {
-  const body: PortalPayload = req.body
-  res.status(200).send(body)
-})
-
 export default router
