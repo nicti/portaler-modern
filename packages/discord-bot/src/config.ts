@@ -20,6 +20,7 @@ const config: BotConfig = {
     host: process.env.REDIS_HOST!,
     password: process.env.REDIS_PASSWORD!,
     port: Number(process.env.REDIS_PORT || 6379),
+    db: Number(process.env.REDIS_DB || 0),
   },
   token: process.env.DISCORD_BOT_TOKEN!,
   roleName: process.env.DISCORD_ROLE!,
