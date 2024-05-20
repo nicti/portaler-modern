@@ -51,5 +51,7 @@ const app = express()
   app.use('/api/portal', verifyUser, Portals)
   app.use('/api/user_info', verifyUser, UsersInfo)
 
-  app.listen(config.port, () => logger.info(`Started: ${config.port}`))
+  app.listen(config.port, 'localhost', () =>
+    logger.info(`Started: ${config.port}`)
+  )
 })()
