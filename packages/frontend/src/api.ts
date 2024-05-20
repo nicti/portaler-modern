@@ -1,11 +1,11 @@
-import Fetchler, { FetchlerOptions } from 'fetchler'
+import axios from 'axios'
 
 import { ConfigActionTypes, tokenStore } from './reducers/configReducer'
 import { ErrorActionTypes } from './reducers/errorReducer'
 import { PortalMapActionTypes } from './reducers/portalMapReducer'
 import store from './store'
 
-const opts: FetchlerOptions = {
+/*const opts: FetchlerOptions = {
   token: tokenStore(),
   handler401: () => {
     store.dispatch({ type: ErrorActionTypes.ADD, error: 'Not Authorized' })
@@ -23,6 +23,22 @@ const opts: FetchlerOptions = {
     }),
 }
 
-const portalerFetchler = new Fetchler(opts)
+const portalerFetchler = new Fetchler(opts)*/
 
-export default portalerFetchler
+const portalerApi = axios.create({})
+
+axios.interceptors.request.use(
+  function (config) {
+    const token = window.localStorage.getItem('token')
+    if (config.headers === undefined) {
+      config.headers = {}
+    }
+    config.headers.Authorization = `Bearer ${token}`
+    return config
+  },
+  function (error) {
+    return Promise.reject(error)
+  }
+)
+
+export default portalerApi

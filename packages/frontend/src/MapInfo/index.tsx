@@ -135,7 +135,7 @@ const MapSearch = () => {
           [styles.hide]: !paths.hasOwnProperty('distance'),
         })}
       >
-        <h3>Shortest Paths ({paths.distance}):</h3>
+        <h3>Shortest Paths ({paths.distance - 1}):</h3>
         {paths.portals?.map((route: string[]) => (
           <div>
             <h4 style={{ marginBottom: 0 }}>To {route[route.length - 1]}</h4>

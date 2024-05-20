@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 
 import { CytoEdgeData } from '../'
 import useGetPortals from '../../common/hooks/useGetPortals'
-import fetchler from '../../fetchler'
+import api from '../../api'
 import { ErrorActionTypes } from '../../reducers/errorReducer'
 
 const useDeleteZone = () => {
@@ -16,8 +16,10 @@ const useDeleteZone = () => {
 
       try {
         const baseUrl = process.env.REACT_APP_API_URL || ''
-        await fetchler.del(`${baseUrl}/api/portal`, {
-          portals: portalIds,
+        await api.delete(`${baseUrl}/api/portal`, {
+          data: {
+            portals: portalIds,
+          },
         })
         checkPortals(true)
       } catch (err: any) {

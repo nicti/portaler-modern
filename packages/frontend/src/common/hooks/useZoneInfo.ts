@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Zone } from '@portaler/types'
 
-import fetchler from '../../fetchler'
+import api from '../../api'
 import { RootState } from '../../reducers'
 import { ZoneActionTypes } from '../../reducers/zoneReducer'
 import useZoneListSelector from './useZoneListSelector'
@@ -23,7 +23,8 @@ const useZoneInfo = (): Zone | null => {
 
         if (!newZone?.info?.markers) {
           const baseUrl = process.env.REACT_APP_API_URL || ''
-          const zoneInfo = await fetchler.get(`${baseUrl}/api/zone/info/${id}`)
+          const zoneInfo = (await api.get(`${baseUrl}/api/zone/info/${id}`))
+            .data
 
           dispatch({ type: ZoneActionTypes.ADD_INFO, zoneInfo })
         }
