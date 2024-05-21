@@ -18,7 +18,7 @@ const defaultSettings: CytoscapeOptions = {
     // @ts-ignore
     nodeDimensionsIncludeLabels: true,
     // @ts-ignore
-    idealEdgeLength: 120,
+    idealEdgeLength: 70,
     // @ts-ignore
     nestingFactor: 0.5,
     // @ts-ignore
