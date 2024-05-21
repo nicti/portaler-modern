@@ -30,8 +30,13 @@ const localUrl = `${host}${
 }`
 
 // Build Regex for CORS
-const replace = process.env.HOST?.split('.').join('\\.')
-const regex = new RegExp(`/${replace}/$`)
+let regex: RegExp | string
+if (process.env.NODE_ENV === 'development') {
+  regex = 'http://localhost:3000'
+} else {
+  const replace = process.env.HOST?.split('.').join('\\.')
+  regex = new RegExp(`/${replace}/$`)
+}
 
 const discordApi = 'https://discord.com/api'
 const discordAuthUrl = `${discordApi}/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_TOKEN}`
