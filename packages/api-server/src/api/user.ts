@@ -3,7 +3,7 @@ import { UserInfo } from '@portaler/types'
 import logger from '../utils/logger'
 import { getUserInfo } from '../database/users'
 import getVerifyUser from '../middleware/verifyUser'
-import { RoleType } from '@portaler/data-models/src/models/Server'
+import { RoleType } from '@portaler/data-models/out/models/Server'
 
 const router = Router()
 
