@@ -88,6 +88,7 @@ export const getZoneMeta = async (id: number): Promise<Zone> => {
       color: zoneRow.color,
       type: zoneRow.zone_type,
       isDeep: zoneRow.is_deep_road,
+      is_dead_end: zoneRow.is_dead_end,
     }
 
     const resourcesData: Resource[] = metaDataRes[1].rows.map(
