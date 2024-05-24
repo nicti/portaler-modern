@@ -2,10 +2,12 @@ import { Router } from 'express'
 import { UserInfo } from '@portaler/types'
 import logger from '../utils/logger'
 import { getUserInfo } from '../database/users'
+import getVerifyUser from '../middleware/verifyUser'
+import { RoleType } from '@portaler/data-models/out/models/Server'
 
 const router = Router()
 
-router.get('/', async (req, res) => {
+router.get('/', getVerifyUser(RoleType.READ), async (req: any, res: any) => {
   try {
     const dbUsersInfo: UserInfo[] = await getUserInfo()
     const users_info = dbUsersInfo.map((p) => ({

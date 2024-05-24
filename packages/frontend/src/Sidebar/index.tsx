@@ -24,44 +24,41 @@ import { SidebarActionTypes } from '../reducers/sideBarReducer'
 import UserSettings from '../UserSettings'
 import Help from './Help'
 import styles from './styles.module.scss'
+import usePermission from '../common/hooks/usePermission'
 
 type TabOpts = 'form' | 'find' | 'info' | 'top' | 'help' | 'settings'
 
-const tabMap = (tabVal: number): TabOpts => {
+const tabMap = (tabVal: number, permission: number): TabOpts => {
   switch (tabVal) {
     case 0:
-      return 'form'
+      return permission === 2 ? 'form' : 'info'
     case 1:
-      return 'find'
+      return permission === 2 ? 'info' : 'top'
     case 2:
-      return 'info'
+      return permission === 2 ? 'top' : 'help'
     case 3:
-      return 'top'
+      return permission === 2 ? 'help' : 'settings'
     case 4:
-      return 'help'
-    case 5:
       return 'settings'
     default:
-      return 'form'
+      return permission === 2 ? 'form' : 'info'
   }
 }
 
-const getTabVal = (tabOpt: TabOpts): number => {
+const getTabVal = (tabOpt: TabOpts, permission: number): number => {
   switch (tabOpt) {
     case 'form':
       return 0
-    case 'find':
-      return 1
     case 'info':
-      return 2
+      return permission === 2 ? 1 : 0
     case 'top':
-      return 3
+      return permission === 2 ? 2 : 1
     case 'help':
-      return 4
+      return permission === 2 ? 3 : 2
     case 'settings':
-      return 5
+      return permission === 2 ? 4 : 3
     default:
-      return 0
+      return permission === 2 ? 0 : 1
   }
 }
 
@@ -79,13 +76,17 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const SideBar = () => {
   const token = useToken()
+  const permission = usePermission() ?? 0
   const dispatch = useDispatch()
 
-  const [tabValue, setTabValue] = useState<TabOpts>(tabMap(0))
+  const [tabValue, setTabValue] = useState<TabOpts>(tabMap(0, permission))
 
-  const handleChange = useCallback((_: any, newValue: number) => {
-    setTabValue(tabMap(newValue))
-  }, [])
+  const handleChange = useCallback(
+    (_: any, newValue: number) => {
+      setTabValue(tabMap(newValue, permission))
+    },
+    [permission]
+  )
 
   const handleSlide = useCallback(() => {
     dispatch({ type: SidebarActionTypes.TOGGLE })
@@ -137,8 +138,7 @@ const SideBar = () => {
             [styles.help]: tabValue === 'help',
           })}
         >
-          {tabValue === 'form' && <PortalForm />}
-          {tabValue === 'find' && <FindPath />}
+          {tabValue === 'form' && permission === 2 && <PortalForm />}
           {tabValue === 'info' && <MapInfo />}
           {tabValue === 'top' && <TopWalkers />}
           {tabValue === 'help' && <Help />}
@@ -147,25 +147,21 @@ const SideBar = () => {
         <animated.div style={opacity} className={styles.nav}>
           <Tabs
             orientation="vertical"
-            value={getTabVal(tabValue)}
+            value={getTabVal(tabValue, permission)}
             textColor="secondary"
             indicatorColor="secondary"
             onChange={handleChange}
             aria-label="panel options"
             className={classes.tabs}
           >
-            <Tab
-              className={classes.tab}
-              icon={<AddLocationIcon />}
-              aria-label="Add location"
-              title="Add location"
-            />
-            <Tab
-              className={classes.tab}
-              icon={<FindPathIcon />}
-              aria-label="Find Path"
-              title="Find Path"
-            />
+            {permission === 2 ? (
+              <Tab
+                className={classes.tab}
+                icon={<AddLocationIcon />}
+                aria-label="Add location"
+                title="Add location"
+              />
+            ) : null}
             <Tab
               className={classes.tab}
               icon={<InfoIcon />}

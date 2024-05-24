@@ -2,8 +2,14 @@ import { NextFunction, Request, Response } from 'express'
 
 import { db, redis } from '../utils/db'
 import logger from '../utils/logger'
+import { RoleType } from '@portaler/data-models/out/models/Server'
 
-const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
+const verifyUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  permission: RoleType
+) => {
   try {
     if (process.env.DISABLE_AUTH === 'true') {
       req.userId = 1
@@ -31,15 +37,25 @@ const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
 
     const [userId, serverId0] = userServer.split(':')
 
-    const discordServerId = process.env.DISCORD_SERVER_ID as string
+    const discordServerIds = (process.env.DISCORD_SERVER_ID as string).split(
+      ','
+    )
 
-    const serverId1 = (await db.Server.getServerIdByDiscordId(
-      discordServerId
-    )) as unknown as string
+    const serverIds: number[] = []
+    for (let i = 0; i < discordServerIds.length; i++) {
+      const sid: string = discordServerIds[i]
+      serverIds.push((await db.Server.getServerIdByDiscordId(sid)) ?? 0)
+    }
 
     // eslint-disable-next-line eqeqeq
-    if (serverId1 != serverId0) {
+    if (!serverIds.includes(parseInt(serverId0))) {
       return res.sendStatus(403)
+    }
+
+    // get permissions for user
+    const perm = await db.User.getPermission(userId, permission)
+    if (!perm) {
+      return res.status(405).send('No permission')
     }
 
     req.userId = Number(userId)
@@ -57,4 +73,10 @@ const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-export default verifyUser
+const getVerifyUser =
+  (permission: RoleType) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    verifyUser(req, res, next, permission)
+  }
+
+export default getVerifyUser

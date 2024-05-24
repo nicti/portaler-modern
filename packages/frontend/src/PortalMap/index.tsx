@@ -4,7 +4,6 @@ import cytoscape, {
   EventObject,
 } from 'cytoscape'
 import fcose from 'cytoscape-fcose'
-import svg from 'cytoscape-svg'
 import { saveAs } from 'file-saver'
 import isEqual from 'lodash/isEqual'
 import { Duration } from 'luxon'
@@ -31,7 +30,6 @@ import { getZoneColor, portalSizeToColor } from './mapStyle'
 import styles from './styles.module.scss'
 
 cytoscape.use(fcose)
-cytoscape.use(svg)
 
 interface CytoMapElement {
   added: boolean
@@ -391,10 +389,14 @@ const PortalMap = () => {
     }
   }, [])
 
-  const printMap = useCallback(() => {
-    const svgContent = cy.current.svg({ scale: 1, full: true, bg: '#333' })
-    const blob = new Blob([svgContent], { type: 'image/svg+xml' })
-    saveAs(blob, 'portal-map.svg')
+  const printMap = useCallback(async () => {
+    const pngContent = cy.current.png({
+      full: true,
+      output: 'blob',
+      bg: '#333',
+    })
+    const blob = new Blob([pngContent], { type: 'image/png' })
+    saveAs(blob, 'portal-map.png')
   }, [])
 
   return (

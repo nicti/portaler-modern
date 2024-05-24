@@ -11,12 +11,10 @@ import Zone from './api/zone'
 import initServer from './initServer'
 import syntaxError from './middleware/syntaxError'
 import validator from './middleware/validator'
-import verifyUser from './middleware/verifyUser'
 import config from './utils/config'
 import logger from './utils/logger'
-import User from './api/user'
-import Portals from './api/portal'
 import UsersInfo from './api/user'
+import Portals from './api/portal'
 
 const app = express()
 
@@ -48,8 +46,8 @@ const app = express()
   app.use('/api/zone', Zone)
 
   // Authed routes
-  app.use('/api/portal', verifyUser, Portals)
-  app.use('/api/user_info', verifyUser, UsersInfo)
+  app.use('/api/portal', Portals)
+  app.use('/api/user_info', UsersInfo)
 
   app.listen(config.port, 'localhost', () =>
     logger.info(`Started: ${config.port}`)

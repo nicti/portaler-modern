@@ -2,6 +2,7 @@ import { GuildMember, PartialGuildMember } from 'discord.js'
 
 import { db, redis } from '../../db'
 import logger from '../../logger'
+import { RoleType } from '@portaler/data-models/out/models/Server'
 
 /**
  * Remove a user's roles and log them out
@@ -18,12 +19,6 @@ const removeUserRoles = async (
 ) => {
   try {
     await db.User.removeUserRoles(userId, roleIds)
-
-    const token = await redis.getToken(userId, serverId)
-
-    if (token) {
-      await redis.delUser(token, userId, serverId)
-    }
   } catch (err: any) {
     logger.error('Remove role', {
       userId,
@@ -70,29 +65,93 @@ const roleHandler = async (member: GuildMember) => {
     const server = await db.Server.getServer(member.guild.id)
 
     if (server) {
+      // if this returns null, the user has no role assigned in database
       const user = await db.User.getFullUser(member.id, server.id)
-      const roleIds = server.roles.map(
-        (r: { discordRoleId: any }) => r.discordRoleId
+      const roles = server.roles
+
+      const newRoles: string[] = member.roles.cache.map((r) => r.id)
+
+      // Handle read role
+      const readRoleId: any[] = roles.filter(
+        (r) => r.role_type === RoleType.READ
       )
 
-      const newRoles = member.roles.cache.map((r) => r.id)
-      const hasRole = newRoles.some((r) => roleIds.includes(r))
+      const hasReadRole = newRoles.some((r) =>
+        readRoleId.map((r) => r.discordRoleId).includes(r)
+      )
 
-      if (user && !hasRole) {
+      if (user && !hasReadRole) {
         // role was removed from user
         removeUserRoles(
           user.id,
           server.id,
-          server.roles.map((r: { id: any }) => r.id)
+          readRoleId.map((r) => r.id)
         )
-      } else if (!user && hasRole) {
+      } else if (!user && hasReadRole) {
         const dbUser = await db.User.getUserByDiscord(member.id)
-        const serverRoleIds = server.roles.map((r: { id: any }) => r.id)
 
         if (dbUser) {
-          await db.User.addRoles(dbUser.id, serverRoleIds, server.id)
+          await db.User.addRoles(
+            dbUser.id,
+            readRoleId.map((r) => r.id),
+            server.id
+          )
         } else {
-          await db.User.createUser(member, server.id, serverRoleIds)
+          await db.User.createUser(
+            member,
+            server.id,
+            readRoleId.map((r) => r.id)
+          )
+        }
+      }
+
+      // Handle write role
+      const writeRoleId: any[] = roles.filter(
+        (r) => r.role_type === RoleType.WRITE
+      )
+
+      const hasWriteRole = newRoles.some((r) =>
+        writeRoleId.map((r) => r.discordRoleId).includes(r)
+      )
+
+      if (user && !hasWriteRole) {
+        // role was removed from user
+        removeUserRoles(
+          user.id,
+          server.id,
+          writeRoleId.map((r) => r.id)
+        )
+      } else if (!user && hasWriteRole) {
+        const dbUser = await db.User.getUserByDiscord(member.id)
+
+        if (dbUser) {
+          await db.User.addRoles(
+            dbUser.id,
+            writeRoleId.map((r) => r.id),
+            server.id
+          )
+        } else {
+          await db.User.createUser(
+            member,
+            server.id,
+            writeRoleId.map((r) => r.id)
+          )
+        }
+      } else if (user && hasWriteRole) {
+        const dbUser = await db.User.getUserByDiscord(member.id)
+
+        if (dbUser) {
+          await db.User.addRoles(
+            dbUser.id,
+            writeRoleId.map((r) => r.id),
+            server.id
+          )
+        } else {
+          await db.User.createUser(
+            member,
+            server.id,
+            writeRoleId.map((r) => r.id)
+          )
         }
       }
     }

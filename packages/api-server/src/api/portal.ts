@@ -12,6 +12,8 @@ import {
 } from '../database/portals'
 import { db } from '../utils/db'
 import logger from '../utils/logger'
+import getVerifyUser from '../middleware/verifyUser'
+import { RoleType } from '@portaler/data-models/out/models/Server'
 
 const router = Router()
 
@@ -33,7 +35,7 @@ const getExpireTime = (size: string, hours: number, minutes: number) => {
     .toJSDate()
 }
 
-router.get('/', async (req, res) => {
+router.get('/', getVerifyUser(RoleType.READ), async (req, res) => {
   try {
     const dbPortals: IPortalModel[] = await getServerPortals(req.serverId)
     const now = DateTime.utc()
@@ -67,7 +69,7 @@ router.get('/', async (req, res) => {
   }
 })
 
-router.post('/', async (req, res) => {
+router.post('/', getVerifyUser(RoleType.WRITE), async (req, res) => {
   try {
     if (req.userId === 0) {
       return res.send(401)
@@ -119,7 +121,7 @@ router.post('/', async (req, res) => {
   }
 })
 
-router.delete('/', async (req, res) => {
+router.delete('/', getVerifyUser(RoleType.WRITE), async (req, res) => {
   try {
     if (req.userId === 0) {
       return res.sendStatus(401)

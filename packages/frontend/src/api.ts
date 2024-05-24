@@ -30,7 +30,7 @@ portalerApi.interceptors.response.use(
       store.dispatch({ type: ErrorActionTypes.ADD, error: 'Not Authorized' })
       store.dispatch({ type: ConfigActionTypes.CLEARTOKEN })
     } else if (error.response.status === 403) {
-      store.dispatch({ type: ErrorActionTypes.ADD, error: 'Forbidden' })
+      store.dispatch({ type: ErrorActionTypes.ADD, error: `Forbidden` })
       store.dispatch({ type: ConfigActionTypes.CLEARTOKEN })
       store.dispatch({ type: PortalMapActionTypes.CLEARALL })
     } else {

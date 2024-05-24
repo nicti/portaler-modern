@@ -4,7 +4,8 @@ import { QueryResult } from 'pg'
 import { DiscordMe, DiscordMeGuild } from '@portaler/types'
 
 import BaseModel, { DBQuery } from './BaseModel'
-import ServerModel, { IServerModel } from './Server'
+import ServerModel, { IServerModel, RoleType } from './Server'
+import user from '@portaler/api-server/src/api/user'
 
 interface ServerRoleId {
   serverId: string
@@ -31,6 +32,23 @@ export enum UserAction {
 export default class UserModel extends BaseModel {
   constructor(dbQuery: DBQuery) {
     super(dbQuery)
+  }
+
+  getPermission = async (
+    userId: string,
+    permission: RoleType
+  ) => {
+    try {
+      const res = await this.query(
+        `
+        SELECT * FROM user_roles as ur JOIN server_roles as sr ON ur.role_id = sr.id WHERE sr.role_type = $1 AND ur.user_id = $2
+        `,
+        [permission, userId]
+      )
+      return res.rowCount !== 0
+    } catch (err) {
+      throw err
+    }
   }
 
   createUser = async (
@@ -173,13 +191,13 @@ export default class UserModel extends BaseModel {
 
     if (dbUserServerRes.rowCount === 0) {
       await this.query(
-        `INSERT INTO user_servers(user_id, server_id) VALUES($1, $2)`,
+        `INSERT INTO user_servers(user_id, server_id) VALUES($1, $2) ON CONFLICT DO NOTHING`,
         [userId, serverId]
       )
     }
 
     const adds = roleIds.map((r) =>
-      this.query(`INSERT INTO user_roles(user_id, role_id) VALUES($1, $2)`, [
+      this.query(`INSERT INTO user_roles(user_id, role_id) VALUES($1, $2) ON CONFLICT DO NOTHING`, [
         userId,
         r,
       ])

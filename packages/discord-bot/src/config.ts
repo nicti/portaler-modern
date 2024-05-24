@@ -4,7 +4,8 @@ interface BotConfig {
   db: DBConfig
   redis: RedisConfig
   token: string
-  roleName: string
+  roleNameRead: string
+  roleNameWrite: string
   api: string
 }
 
@@ -23,7 +24,8 @@ const config: BotConfig = {
     db: Number(process.env.REDIS_DB || 0),
   },
   token: process.env.DISCORD_BOT_TOKEN!,
-  roleName: process.env.DISCORD_ROLE!,
+  roleNameRead: process.env.DISCORD_ROLE_READ!,
+  roleNameWrite: process.env.DISCORD_ROLE_WRITE!,
   api: 'https://discord.com/api',
 }
 

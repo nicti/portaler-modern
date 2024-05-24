@@ -8,8 +8,9 @@ import config from '../utils/config'
 import { db, redis } from '../utils/db'
 import fetchToken from '../utils/discord/fetchToken'
 import fetchUser from '../utils/discord/fetchUser'
-import fetchUserGuilds from '../utils/discord/fetchUserGuilds'
+import fetchUserGuilds, { DiscordMeGuilds } from '../utils/discord/fetchUserGuilds'
 import logger from '../utils/logger'
+import { RoleType } from '@portaler/data-models/out/models/Server'
 
 const router = Router()
 
@@ -20,7 +21,7 @@ router.get('/login', (_, res) => {
 // should come from auth.portaler
 router.get('/callback', async (req, res) => {
   try {
-    const discordServerId = process.env.DISCORD_SERVER_ID as string
+    const discordServerId = (process.env.DISCORD_SERVER_ID as string).split(',')
 
     const protocol = req.secure ? 'https://' : 'http://'
     const code = req.query.code as string
@@ -39,7 +40,13 @@ router.get('/callback', async (req, res) => {
       server,
       discordJson.refresh_token
     )
-    const serverId = await db.Server.getServerIdByDiscordId(discordServerId)
+    // Find common discord servers between user and env
+    const commonDiscordIds: DiscordMeGuilds[] = server.filter(
+      (v: DiscordMeGuilds) => discordServerId.includes(v.id)
+    )
+    const serverId = await db.Server.getServerIdByDiscordId(
+      commonDiscordIds[0].id
+    )
     if (!serverId) {
       throw new Error('NoServerFound: ' + serverId)
     }
@@ -64,7 +71,23 @@ router.get('/callback', async (req, res) => {
       JSON.stringify({ user })
     )
 
-    res.redirect(`${redirectUrl}/?token=${ourToken}`)
+    const hasRead = await db.User.getPermission(
+      user.id.toString(),
+      RoleType.READ
+    )
+    const hasWrite = await db.User.getPermission(
+      user.id.toString(),
+      RoleType.WRITE
+    )
+    let permission = 0
+    if (hasRead) {
+      permission = 1
+    }
+    if (hasWrite) {
+      permission = 2
+    }
+
+    res.redirect(`${redirectUrl}/?token=${ourToken}&permission=${permission}`)
   } catch (err: any) {
     logger.error('Error logging in User', {
       error: {

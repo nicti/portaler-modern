@@ -9,12 +9,13 @@ const useSetToken = () => {
   useEffect(() => {
     const params = new URLSearchParams(document.location.search.substring(1))
     const urlToken = params.get('token')
+    const permission = params.get('permission')
 
     if (urlToken) {
       window.history.replaceState(null, '', window.location.pathname)
 
       if (urlToken !== 'invalid') {
-        dispatch({ type: ConfigActionTypes.TOKEN, token: urlToken })
+        dispatch({ type: ConfigActionTypes.TOKEN, token: urlToken, permission })
       } else {
         dispatch({ type: ErrorActionTypes.ADD, error: 'Invalid Login' })
       }
