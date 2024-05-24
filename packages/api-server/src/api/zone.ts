@@ -40,11 +40,11 @@ router.post('/deadend', getVerifyUser(RoleType.WRITE), async (req, res) => {
     return res.status(400).send('Zone is not a road')
   }
   const dbPortals: IPortalModel[] = await getServerPortals(req.serverId)
-  dbPortals.filter(
+  const relatedPortals = dbPortals.filter(
     (portal: IPortalModel) =>
       portal.conn1 === body.zoneName || portal.conn2 === body.zoneName
   )
-  if (dbPortals.length > 1) {
+  if (relatedPortals.length > 1) {
     return res.status(400).send('Zone has too many portals')
   }
   zones.find((z: any) => z.id === body.zoneId).is_dead_end = !zone.is_dead_end
