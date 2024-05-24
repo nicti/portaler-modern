@@ -5,7 +5,6 @@ import { DiscordMe, DiscordMeGuild } from '@portaler/types'
 
 import BaseModel, { DBQuery } from './BaseModel'
 import ServerModel, { IServerModel, RoleType } from './Server'
-import user from '@portaler/api-server/src/api/user'
 
 interface ServerRoleId {
   serverId: string
