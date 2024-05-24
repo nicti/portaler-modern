@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { ConfigActionTypes, tokenStore } from './reducers/configReducer'
+import { ConfigActionTypes } from './reducers/configReducer'
 import { ErrorActionTypes } from './reducers/errorReducer'
 import { PortalMapActionTypes } from './reducers/portalMapReducer'
 import store from './store'

@@ -4,6 +4,8 @@ import cytoscape, {
   EventObject,
 } from 'cytoscape'
 import fcose from 'cytoscape-fcose'
+import contextMenus from 'cytoscape-context-menus'
+
 import { saveAs } from 'file-saver'
 import isEqual from 'lodash/isEqual'
 import { Duration } from 'luxon'
@@ -28,8 +30,13 @@ import defaultSettings from './defaultSettings'
 import graphStyle from './graphStyle'
 import { getZoneColor, portalSizeToColor } from './mapStyle'
 import styles from './styles.module.scss'
+import usePermission from '../common/hooks/usePermission'
+import api from '../api'
+import { filterZones } from '../ZoneSearch/zoneSearchUtils'
+import zoneReducer, { ZoneActionTypes } from '../reducers/zoneReducer'
 
 cytoscape.use(fcose)
+cytoscape.use(contextMenus)
 
 interface CytoMapElement {
   added: boolean
@@ -70,6 +77,7 @@ const PortalMap = () => {
   const controlBar = useRef<HTMLDivElement | null>(null)
   const dispatch = useDispatch()
   const zones = useZoneListSelector()
+  const permission = usePermission()
   const portals = useSelector((state: RootState) => state.portalMap.portals)
   const centerZone = useSelector(
     (state: RootState) => state.portalMap.centerZone
@@ -156,6 +164,45 @@ const PortalMap = () => {
       } as CytoscapeOptions)
 
       cy.current.on('tap', cyClickHandler)
+      if (permission === 2) {
+        cy.current.contextMenus({
+          menuItems: [
+            {
+              id: 'deadend',
+              content: 'Dead End',
+              selector: 'node',
+              onClickFunction: function (
+                event:
+                  | cytoscape.EventObject
+                  | cytoscape.EventObjectCore
+                  | cytoscape.EventObjectNode
+                  | cytoscape.EventObjectEdge
+              ) {
+                const data: {
+                  id: string
+                  zoneName: string
+                  zoneId: number
+                  label: string
+                } = event.target.data()
+                const baseUrl = process.env.REACT_APP_API_URL || ''
+                api
+                  .post(`${baseUrl}/api/zone/deadend`, {
+                    zoneId: data.zoneId,
+                    zoneName: data.zoneName,
+                  })
+                  .then(() => {
+                    api.get(`${baseUrl}/api/zone/list`).then((r) => {
+                      dispatch({
+                        type: ZoneActionTypes.ADD,
+                        zones: r.data as Zone[],
+                      })
+                    })
+                  })
+              },
+            },
+          ],
+        })
+      }
     } else {
       cy.current.style(graphStyle)
     }
@@ -193,6 +240,20 @@ const PortalMap = () => {
         const height =
           isHome || z.color === 'city' || z.color === 'city-black' ? 42 : 30
 
+        let outlineColor = '#222'
+        let borderSettings: any = {
+          'border-width': 0,
+          'border-color': 'unset',
+          'border-style': 'unset',
+        }
+        if (z.is_dead_end) {
+          outlineColor = 'red'
+          borderSettings = {
+            'border-width': 1,
+            'border-color': 'red',
+            'border-style': 'solid',
+          }
+        }
         if (!elms.has(id)) {
           const imgUrl = z.tier ? tiers[z.tier as ZoneTier] : null
           const backgroundUrl = imgUrl ? `url(${imgUrl})` : 'none'
@@ -209,7 +270,13 @@ const PortalMap = () => {
           elms.set(id, {
             added: false,
             element: {
-              data: { id, zoneName: z.name, zoneId: z.id, label },
+              data: {
+                id,
+                zoneName: z.name,
+                zoneId: z.id,
+                label,
+                is_dead_end: z.is_dead_end,
+              },
               css: {
                 width,
                 height,
@@ -218,14 +285,32 @@ const PortalMap = () => {
                 'background-height': height,
                 'background-width': width,
                 'background-repeat': 'no-repeat',
-                'text-outline-color': '#222',
+                'text-outline-color': outlineColor,
                 'text-outline-width': 1,
                 'text-outline-opacity': 0.5,
                 'text-margin-y': -5,
                 shape: getShape(z),
+                ...borderSettings,
               },
             },
           })
+        } else {
+          const listElement: any = elms.get(id)
+          if (listElement?.element.data.is_dead_end !== z.is_dead_end) {
+            listElement.element.data.is_dead_end = z.is_dead_end
+            listElement.element.css['text-outline-color'] = outlineColor
+            listElement.element.css['border-width'] =
+              borderSettings['border-width']
+            listElement.element.css['border-color'] =
+              borderSettings['border-color']
+            listElement.element.css['border-style'] =
+              borderSettings['border-style']
+            const updateElm = cy.current.$(`#${id}`)
+            updateElm.css('text-outline-color', outlineColor)
+            updateElm.css('border-width', borderSettings['border-width'])
+            updateElm.css('border-color', borderSettings['border-color'])
+            updateElm.css('border-style', borderSettings['border-style'])
+          }
         }
       })
 

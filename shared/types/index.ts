@@ -57,6 +57,7 @@ export interface Zone extends ZoneLite {
   albionId?: string
   info?: ZoneInfo
   shortestPaths?: any
+  is_dead_end: boolean
 }
 
 export interface PortalPayload {

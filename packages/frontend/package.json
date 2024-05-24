@@ -23,6 +23,7 @@
     "axios": "^0.28.1",
     "clsx": "^1.2.1",
     "cytoscape": "^3.23.0",
+    "cytoscape-context-menus": "^4.1.0",
     "cytoscape-fcose": "^2.1.0",
     "file-saver": "^2.0.5",
     "lodash": "^4.17.21",
@@ -43,6 +44,7 @@
   "devDependencies": {
     "@portaler/types": "*",
     "@types/cytoscape": "^3.19.9",
+    "@types/cytoscape-context-menus": "^4.1.4",
     "@types/jest": "^29.2.0",
     "@types/lodash": "^4.14.186",
     "@types/luxon": "^3.0.2",

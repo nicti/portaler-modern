@@ -9,5 +9,6 @@ export const DEFAULT_ZONE: Zone = {
   tier: '',
   color: 'black',
   type: '',
+  is_dead_end: false,
   shortestPaths: {},
 }

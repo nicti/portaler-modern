@@ -2226,6 +2226,13 @@
   resolved "https://registry.npmjs.org/@types/cors/-/cors-2.8.12.tgz"
   integrity sha512-vt+kDhq/M2ayberEtJcIN/hxXy1Pk+59g2FV/ZQceeaTyCtCucjL2Q7FXlFjtWn4n15KCr1NE2lNNFhp0lEThw==
 
+"@types/cytoscape-context-menus@^4.1.4":
+  version "4.1.4"
+  resolved "https://registry.npmjs.org/@types/cytoscape-context-menus/-/cytoscape-context-menus-4.1.4.tgz"
+  integrity sha512-oiaZ202fjR/yEPyuWXjPjZQ9P+58NpZG+lv2gLeMP/pE0v683kUrgTE2hO1WAWhpq1rlAh/B0LTjGEDEH+lAXA==
+  dependencies:
+    "@types/cytoscape" "*"
+
 "@types/cytoscape@*", "@types/cytoscape@^3.19.9":
   version "3.19.9"
   resolved "https://registry.npmjs.org/@types/cytoscape/-/cytoscape-3.19.9.tgz"
@@ -4172,6 +4179,11 @@ csstype@^3.0.2:
   version "3.1.1"
   resolved "https://registry.npmjs.org/csstype/-/csstype-3.1.1.tgz"
   integrity sha512-DJR/VvkAvSZW9bTouZue2sSxDwdTN92uHjqeKVm+0dAqdfNykRzQ95tay8aXMBAAPpUiq4Qcug2L7neoRh2Egw==
+
+cytoscape-context-menus@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.npmjs.org/cytoscape-context-menus/-/cytoscape-context-menus-4.1.0.tgz"
+  integrity sha512-qbrdRfz8JQuZBZamhzmExPpJvUNR4VA3rcN4qChu4eVplWYU4n8N98A0ksrr2kfmUvCAL529N04KzwZd8xra7w==
 
 cytoscape-fcose@^2.1.0:
   version "2.1.0"
