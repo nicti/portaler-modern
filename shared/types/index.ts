@@ -114,4 +114,5 @@ export interface IZoneModel {
   zone_type: string
   color: ZoneColor
   is_deep_road: boolean
+  is_dead_end: boolean
 }

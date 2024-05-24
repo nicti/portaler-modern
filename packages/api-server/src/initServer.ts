@@ -37,6 +37,7 @@ const initServer = async () => {
       type: z.zone_type,
       isDeep: z.is_deep_road,
       shortestPaths: {},
+      is_dead_end: z.is_dead_end,
     }))
 
     await redis.setZones(zoneList)
