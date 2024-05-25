@@ -31,6 +31,7 @@
     "@portaler/types": "*",
     "@types/luxon": "^3.0.2",
     "@types/md5": "^2.3.2",
-    "@types/node-fetch": "^2.6.2"
+    "@types/node-fetch": "^2.6.2",
+    "typescript": "^5.4.5"
   }
 }
