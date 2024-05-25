@@ -5,7 +5,9 @@ import logger from './logger'
 import { db } from './db'
 
 const migrations = async () => {
-  const discord_server_id = process.env.DISCORD_SERVER_ID as unknown as string
+  const discord_server_id = (
+    process.env.DISCORD_SERVER_ID as unknown as string
+  ).split(',')[0]
   try {
     await createDb(config.db.database, {
       ...config.db,

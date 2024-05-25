@@ -89,7 +89,6 @@ const calculateWorldMapping = (fileData: FullZone[]) => {
     }
   })
   redis.setShortestPaths(bzToPortals)
-  const a = 'b'
 }
 
 export default calculateWorldMapping

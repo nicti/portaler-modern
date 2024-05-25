@@ -59,7 +59,7 @@ const verifyUser = async (
     }
 
     req.userId = Number(userId)
-    req.serverId = Number(serverId0)
+    req.serverId = Number(discordServerIds[0])
 
     next()
   } catch (err: any) {

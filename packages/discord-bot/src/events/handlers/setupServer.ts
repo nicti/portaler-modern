@@ -14,7 +14,7 @@ const fetchRole = async (
   sid: number,
   dbServer: IServerModel
 ) => {
-  const members = await server.members.fetch({ force: true })
+  const members = await server.members.fetch()
 
   const membersToAdd = members.filter(
     (m: { roles: { cache: { has: (arg0: any) => any } } }) =>
