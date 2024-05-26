@@ -35,7 +35,7 @@ router.get('/list', async (_, res) => {
 router.post('/deadend', getVerifyUser(RoleType.WRITE), async (req, res) => {
   const body: { zoneId: number; zoneName: string } = req.body
   const zones = JSON.parse(await redis.getZones())
-  const zone = zones.find((z: any) => z.id === body.zoneId)
+  const zone = zones.find((z: any) => z.name === body.zoneName)
   if (!zone.type.startsWith('TUNNEL_')) {
     return res.status(400).send('Zone is not a road')
   }
@@ -47,7 +47,7 @@ router.post('/deadend', getVerifyUser(RoleType.WRITE), async (req, res) => {
   if (relatedPortals.length > 1) {
     return res.status(400).send('Zone has too many portals')
   }
-  zones.find((z: any) => z.id === body.zoneId).is_dead_end = !zone.is_dead_end
+  zones.find((z: any) => z.name === body.zoneName).is_dead_end = !zone.is_dead_end
   redis.setZones(zones).then(() => {
     res.sendStatus(204)
   })
@@ -56,6 +56,8 @@ router.post('/deadend', getVerifyUser(RoleType.WRITE), async (req, res) => {
 router.get('/info/:id', async (req, res) => {
   try {
     const zone = await getZoneMeta(Number(req.params.id))
+    const zones = JSON.parse(await redis.getZones())
+    zone.is_dead_end = zones.find((z: any) => z.name === zone.name).is_dead_end
     res.contentType('application/json').status(200).send(zone)
   } catch (err: any) {
     logger.error('Error fetching zone info', {

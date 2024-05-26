@@ -10,6 +10,7 @@ import Search from './Search'
 import styles from './styles.module.scss'
 import ZoneInfo from './ZoneInfo'
 import PrintMap from './PrintMap'
+import DeadendNode from './DeadendNode'
 
 interface ControlBarProps {
   handleHome: (zone: Zone) => void
@@ -26,6 +27,7 @@ const ControlBar = forwardRef<HTMLDivElement, ControlBarProps>(
         <ZoneInfo />
       </div>
       <div className={styles.controls}>
+        <DeadendNode edgeData={edgeData} zoneName={zone?.name} />
         <DeleteNode edgeData={edgeData} zoneName={zone?.name} />
         <Search />
         <HomeButton handleHome={handleHome} />

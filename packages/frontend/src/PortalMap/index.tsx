@@ -4,7 +4,6 @@ import cytoscape, {
   EventObject,
 } from 'cytoscape'
 import fcose from 'cytoscape-fcose'
-import contextMenus from 'cytoscape-context-menus'
 
 import { saveAs } from 'file-saver'
 import isEqual from 'lodash/isEqual'
@@ -36,7 +35,6 @@ import { filterZones } from '../ZoneSearch/zoneSearchUtils'
 import zoneReducer, { ZoneActionTypes } from '../reducers/zoneReducer'
 
 cytoscape.use(fcose)
-cytoscape.use(contextMenus)
 
 interface CytoMapElement {
   added: boolean
@@ -164,45 +162,6 @@ const PortalMap = () => {
       } as CytoscapeOptions)
 
       cy.current.on('tap', cyClickHandler)
-      if (permission === 2) {
-        cy.current.contextMenus({
-          menuItems: [
-            {
-              id: 'deadend',
-              content: 'Dead End',
-              selector: 'node',
-              onClickFunction: function (
-                event:
-                  | cytoscape.EventObject
-                  | cytoscape.EventObjectCore
-                  | cytoscape.EventObjectNode
-                  | cytoscape.EventObjectEdge
-              ) {
-                const data: {
-                  id: string
-                  zoneName: string
-                  zoneId: number
-                  label: string
-                } = event.target.data()
-                const baseUrl = process.env.REACT_APP_API_URL || ''
-                api
-                  .post(`${baseUrl}/api/zone/deadend`, {
-                    zoneId: data.zoneId,
-                    zoneName: data.zoneName,
-                  })
-                  .then(() => {
-                    api.get(`${baseUrl}/api/zone/list`).then((r) => {
-                      dispatch({
-                        type: ZoneActionTypes.ADD,
-                        zones: r.data as Zone[],
-                      })
-                    })
-                  })
-              },
-            },
-          ],
-        })
-      }
     } else {
       cy.current.style(graphStyle)
     }
@@ -243,8 +202,6 @@ const PortalMap = () => {
         let outlineColor = '#222'
         let borderSettings: any = {
           'border-width': 0,
-          'border-color': 'unset',
-          'border-style': 'unset',
         }
         if (z.is_dead_end) {
           outlineColor = 'red'
