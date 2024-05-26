@@ -3,7 +3,6 @@ import { Router } from 'express'
 import { getZoneMeta } from '../database/zones'
 import { redis } from '../utils/db'
 import logger from '../utils/logger'
-import { PortalPayload } from '@portaler/types'
 import getVerifyUser from '../middleware/verifyUser'
 import { RoleType } from '@portaler/data-models/out/models/Server'
 import { getServerPortals, IPortalModel } from '../database/portals'
@@ -47,7 +46,8 @@ router.post('/deadend', getVerifyUser(RoleType.WRITE), async (req, res) => {
   if (relatedPortals.length > 1) {
     return res.status(400).send('Zone has too many portals')
   }
-  zones.find((z: any) => z.name === body.zoneName).is_dead_end = !zone.is_dead_end
+  zones.find((z: any) => z.name === body.zoneName).is_dead_end =
+    !zone.is_dead_end
   redis.setZones(zones).then(() => {
     res.sendStatus(204)
   })

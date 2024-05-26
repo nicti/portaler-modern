@@ -1,6 +1,13 @@
 import 'dotenv/config'
 
-import { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, SlashCommandSubcommandBuilder } from 'discord.js'
+import {
+  Client,
+  GatewayIntentBits,
+  REST,
+  Routes,
+  SlashCommandBuilder,
+  SlashCommandSubcommandBuilder,
+} from 'discord.js'
 
 import getDb from './db'
 import initEvents from './events'
@@ -32,9 +39,7 @@ const client = new Client({
     process.env.DISCORD_BOT_TOKEN as string
   )
 
-  const mainGuildId = (process.env.DISCORD_GUILD_ID as string).split(
-    ','
-  )[0]
+  const mainGuildId = (process.env.DISCORD_GUILD_ID as string).split(',')[0]
   await rest.put(
     Routes.applicationGuildCommands(
       process.env.DISCORD_CLIENT_ID as string,

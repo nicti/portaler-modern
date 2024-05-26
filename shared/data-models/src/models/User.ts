@@ -33,10 +33,7 @@ export default class UserModel extends BaseModel {
     super(dbQuery)
   }
 
-  getPermission = async (
-    userId: string,
-    permission: RoleType
-  ) => {
+  getPermission = async (userId: string, permission: RoleType) => {
     try {
       const res = await this.query(
         `
@@ -196,10 +193,10 @@ export default class UserModel extends BaseModel {
     }
 
     const adds = roleIds.map((r) =>
-      this.query(`INSERT INTO user_roles(user_id, role_id) VALUES($1, $2) ON CONFLICT DO NOTHING`, [
-        userId,
-        r,
-      ])
+      this.query(
+        `INSERT INTO user_roles(user_id, role_id) VALUES($1, $2) ON CONFLICT DO NOTHING`,
+        [userId, r]
+      )
     )
 
     await Promise.all(adds)

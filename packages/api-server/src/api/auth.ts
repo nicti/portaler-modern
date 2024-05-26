@@ -8,7 +8,9 @@ import config from '../utils/config'
 import { db, redis } from '../utils/db'
 import fetchToken from '../utils/discord/fetchToken'
 import fetchUser from '../utils/discord/fetchUser'
-import fetchUserGuilds, { DiscordMeGuilds } from '../utils/discord/fetchUserGuilds'
+import fetchUserGuilds, {
+  DiscordMeGuilds,
+} from '../utils/discord/fetchUserGuilds'
 import logger from '../utils/logger'
 import { RoleType } from '@portaler/data-models/out/models/Server'
 

@@ -53,12 +53,15 @@
     "prettier": "^2.7.1",
     "prettier-eslint": "^15.0.1",
     "rimraf": "^3.0.2",
-    "typescript": "^5.4.5"
+    "typescript": "~5.3",
+    "@typescript-eslint/typescript-estree": "^7.10.0",
+    "fork-ts-checker-webpack-plugin": "^6.0"
   },
   "overrides": {
     "@typescript-eslint/eslint-plugin": "^6.0",
     "@typescript-eslint/parser": "^6.0",
-    "fork-ts-checker-webpack-plugin": "^6.0"
+    "fork-ts-checker-webpack-plugin": "^6.0",
+    "@typescript-eslint/typescript-estree": "^7.10.0"
   },
   "private": true
 }

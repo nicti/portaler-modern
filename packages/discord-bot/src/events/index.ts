@@ -24,12 +24,12 @@ const initEvents = (client: Client) => {
 
   // when members get updated
   client.on('guildMemberUpdate', (_, member: GuildMember) =>
-    roleHandler(member),
+    roleHandler(member)
   )
 
   // when a member leaves a server
   client.on('guildMemberRemove', (member: GuildMember | PartialGuildMember) =>
-    removeUser(member),
+    removeUser(member)
   )
 
   client.on(
@@ -40,7 +40,7 @@ const initEvents = (client: Client) => {
         if (interaction.options.getSubcommand() === 'routes') {
           // get main discord id
           const mainGuildId = (process.env.DISCORD_GUILD_ID as string).split(
-            ',',
+            ','
           )[0]
           const mainGuildInternal = await db.Server.getServer(mainGuildId)
           if (!mainGuildInternal) {
@@ -51,7 +51,7 @@ const initEvents = (client: Client) => {
           }
           const zones = JSON.parse(await redis.getZones())
           const shortestPathToBzPortal = JSON.parse(
-            await redis.getShortestPaths(),
+            await redis.getShortestPaths()
           )
           const portals = (
             await db.dbQuery('SELECT * FROM portals WHERE server_id = $1;', [
@@ -64,8 +64,8 @@ const initEvents = (client: Client) => {
                 !zone.type.startsWith('TUNNEL_') &&
                 portal.size !== 'const' &&
                 portal.size !== 'royal' &&
-                (portal.conn1 === zone.name || portal.conn2 === zone.name),
-            ),
+                (portal.conn1 === zone.name || portal.conn2 === zone.name)
+            )
           )
           let validUntil: number = Infinity
           const portalGraph: Graph = new Graph({ type: 'undirected' })
@@ -92,7 +92,7 @@ const initEvents = (client: Client) => {
               bidirectional(
                 portalGraph,
                 'Setent-Et-Nusum',
-                portaledZone.name,
+                portaledZone.name
               ) ?? null
             if (path) {
               bidirectionalPaths.push(path)
@@ -105,7 +105,9 @@ const initEvents = (client: Client) => {
             const targetZone = bidirectionalPath[bidirectionalPath.length - 1]
             const color = zones.find((z: any) => z.name === targetZone).color
             let distance = bidirectionalPath.length - 1
-            let name = `Path to ${targetZone} :${color}_circle: (${bidirectionalPath.length - 1})`
+            let name = `Path to ${targetZone} :${color}_circle: (${
+              bidirectionalPath.length - 1
+            })`
             if (
               zones
                 .find((z: any) => z.name === targetZone)
@@ -113,7 +115,9 @@ const initEvents = (client: Client) => {
             ) {
               // this is a black zone, get the shortest path to bz portal
               const shortestPathToRoyal = shortestPathToBzPortal[targetZone]
-              name = `Path to ${targetZone} :${color}_circle: (${bidirectionalPath.length - 1}, ${
+              name = `Path to ${targetZone} :${color}_circle: (${
+                bidirectionalPath.length - 1
+              }, ${
                 shortestPathToRoyal.distance - 1
               } to ${shortestPathToRoyal.to.join(', ')})`
               distance += shortestPathToRoyal.distance - 1
@@ -126,11 +130,12 @@ const initEvents = (client: Client) => {
             })
           }
           const embed = new EmbedBuilder().setTitle('Current royal/bz portals')
-          const biDirectionalPathsExtendedSorted = biDirectionalPathsExtended.sort((a, b) => {
-            if (a.distance < b.distance) return -1
-            if (a.distance > b.distance) return 1
-            return 0
-          })
+          const biDirectionalPathsExtendedSorted =
+            biDirectionalPathsExtended.sort((a, b) => {
+              if (a.distance < b.distance) return -1
+              if (a.distance > b.distance) return 1
+              return 0
+            })
           for (let i = 0; i < biDirectionalPathsExtendedSorted.length; i++) {
             const bidirectionalPath = biDirectionalPathsExtendedSorted[i]
             embed.addFields([
@@ -141,13 +146,15 @@ const initEvents = (client: Client) => {
               },
             ])
           }
-          embed.setDescription(`Valid until: ${new Date(validUntil).toUTCString()} | <t:${round(validUntil / 1000)}:R>
+          embed.setDescription(`Valid until: ${new Date(
+            validUntil
+          ).toUTCString()} | <t:${round(validUntil / 1000)}:R>
 Posted at: ${new Date().toUTCString()} | <t:${round(Date.now() / 1000)}:R>`)
 
           return interaction.reply({ embeds: [embed] })
         }
       }
-    },
+    }
   )
 }
 

@@ -25,7 +25,6 @@ const getDatabases = async (
       const redis = new RedisConnector(redisConfig)
 
       if (redis) {
-        console.log('Connected to Db & Redis')
         return { db, redis }
       } else {
         throw new Error('Error connecting to Redis')
@@ -36,8 +35,7 @@ const getDatabases = async (
       minTimeout: 100,
       maxTimeout: 1000,
       randomize: false,
-      onRetry: (err, count: number) =>
-        console.log(`Retrying db connection ${count}`, err),
+      onRetry: (err, count: number) => {},
     }
   )
 

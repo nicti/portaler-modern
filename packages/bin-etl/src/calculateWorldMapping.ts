@@ -35,9 +35,7 @@ const calculateWorldMapping = (fileData: FullZone[]) => {
         try {
           // @ts-ignore
           bzGraph.addEdge(item.displayname, target)
-        } catch (UsageGraphError) {
-          console.log('Error adding edge', item.displayname, target)
-        }
+        } catch (UsageGraphError) {}
       })
     }
   })
