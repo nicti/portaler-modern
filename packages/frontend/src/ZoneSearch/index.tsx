@@ -16,9 +16,12 @@ interface ZoneSearchProps {
   label: string
   value: Zone
   update: (zone: Zone) => void
-  variant: 'filled' | 'outlined' | 'standard'
-  error: string | null
-  setFocus: number
+  // eslint-disable-next-line react/require-default-props
+  variant?: 'filled' | 'outlined' | 'standard'
+  // eslint-disable-next-line react/require-default-props
+  error?: string | null
+  // eslint-disable-next-line react/require-default-props
+  setFocus?: number
 }
 
 const ZoneSearch: FC<ZoneSearchProps> = ({
