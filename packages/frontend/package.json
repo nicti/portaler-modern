@@ -23,7 +23,6 @@
     "axios": "^0.28.1",
     "clsx": "^1.2.1",
     "cytoscape": "^3.23.0",
-    "cytoscape-context-menus": "^4.1.0",
     "cytoscape-fcose": "^2.1.0",
     "file-saver": "^2.0.5",
     "lodash": "^4.17.21",
