@@ -40,7 +40,7 @@ if (process.env.NODE_ENV === 'development') {
 
 const discordApi = 'https://discord.com/api'
 const discordAuthUrl = `${discordApi}/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_TOKEN}`
-const discordBotPerms = '268435456'
+const discordBotPerms = '268502016'
 
 const config: IConfig = {
   cors: {

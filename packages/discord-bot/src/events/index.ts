@@ -4,6 +4,9 @@ import {
   Guild,
   GuildMember,
   PartialGuildMember,
+  CommandInteraction,
+  MessageManager,
+  Message,
 } from 'discord.js'
 import roleHandler, { removeUser } from './handlers/roleHandler'
 import setupServer from './handlers/setupServer'
@@ -12,6 +15,7 @@ import { db, redis } from '../db'
 import Graph from 'graphology'
 import { bidirectional } from 'graphology-shortest-path/unweighted'
 import { round } from 'lodash'
+import logger from '../logger'
 
 const initEvents = (client: Client) => {
   // bot joins a server
@@ -30,124 +34,147 @@ const initEvents = (client: Client) => {
     removeUser(member)
   )
 
-  client.on('interactionCreate', async (interaction: any) => {
-    if (!interaction.isCommand()) return
-    if (interaction.commandName === 'portaler') {
-      if (interaction.options.getSubcommand() === 'routes') {
-        // get main discord id
-        const mainGuildId = (process.env.DISCORD_GUILD_ID as string).split(
-          ','
-        )[0]
-        const mainGuildInternal = await db.Server.getServer(mainGuildId)
-        if (!mainGuildInternal) {
-          return interaction.reply({
-            content: 'Server not found',
-            ephemeral: true,
-          })
-        }
-        const zones = JSON.parse(await redis.getZones())
-        const shortestPathToBzPortal = JSON.parse(
-          await redis.getShortestPaths()
-        )
-        const portals = (
-          await db.dbQuery('SELECT * FROM portals WHERE server_id = $1;', [
-            mainGuildInternal.id,
-          ])
-        ).rows
-        const portaledZones = zones.filter((zone: any) =>
-          portals.some(
-            (portal: any) =>
-              !zone.type.startsWith('TUNNEL_') &&
-              portal.size !== 'const' &&
-              portal.size !== 'royal' &&
-              (portal.conn1 === zone.name || portal.conn2 === zone.name)
+  client.on(
+    'interactionCreate',
+    async (interaction: CommandInteraction | any) => {
+      if (!interaction.isCommand()) return
+      if (interaction.commandName === 'portaler') {
+        if (interaction.options.getSubcommand() === 'routes') {
+          // get main discord id
+          const mainGuildId = (process.env.DISCORD_GUILD_ID as string).split(
+            ','
+          )[0]
+          const mainGuildInternal = await db.Server.getServer(mainGuildId)
+          if (!mainGuildInternal) {
+            return interaction.reply({
+              content: 'Server not found',
+              ephemeral: true,
+            })
+          }
+          const zones = JSON.parse(await redis.getZones())
+          const shortestPathToBzPortal = JSON.parse(
+            await redis.getShortestPaths()
           )
-        )
-        let validUntil: number = Infinity
-        const portalGraph: Graph = new Graph({ type: 'undirected' })
-        for (let i = 0; i < portals.length; i++) {
-          const portal = portals[i]
-          if (portal.size === 'const' || portal.size === 'royal') continue
-          if (!portalGraph.hasNode(portal.conn1)) {
-            portalGraph.addNode(portal.conn1)
+          const portals = (
+            await db.dbQuery('SELECT * FROM portals WHERE server_id = $1;', [
+              mainGuildInternal.id,
+            ])
+          ).rows
+          const portaledZones = zones.filter((zone: any) =>
+            portals.some(
+              (portal: any) =>
+                !zone.type.startsWith('TUNNEL_') &&
+                portal.size !== 'const' &&
+                portal.size !== 'royal' &&
+                (portal.conn1 === zone.name || portal.conn2 === zone.name)
+            )
+          )
+          let validUntil: number = Infinity
+          const portalGraph: Graph = new Graph({ type: 'undirected' })
+          for (let i = 0; i < portals.length; i++) {
+            const portal = portals[i]
+            if (portal.size === 'const' || portal.size === 'royal') continue
+            if (!portalGraph.hasNode(portal.conn1)) {
+              portalGraph.addNode(portal.conn1)
+            }
+            if (!portalGraph.hasNode(portal.conn2)) {
+              portalGraph.addNode(portal.conn2)
+            }
+            if (!portalGraph.hasEdge(portal.conn1, portal.conn2)) {
+              portalGraph.addEdge(portal.conn1, portal.conn2)
+            }
+            if (portal.expires < validUntil) {
+              validUntil = portal.expires
+            }
           }
-          if (!portalGraph.hasNode(portal.conn2)) {
-            portalGraph.addNode(portal.conn2)
+          const bidirectionalPaths = []
+          for (let i = 0; i < portaledZones.length; i++) {
+            const portaledZone = portaledZones[i]
+            const path =
+              bidirectional(
+                portalGraph,
+                'Setent-Et-Nusum',
+                portaledZone.name
+              ) ?? null
+            if (path) {
+              bidirectionalPaths.push(path)
+            }
           }
-          if (!portalGraph.hasEdge(portal.conn1, portal.conn2)) {
-            portalGraph.addEdge(portal.conn1, portal.conn2)
-          }
-          if (portal.expires < validUntil) {
-            validUntil = portal.expires
-          }
-        }
-        const bidirectionalPaths = []
-        for (let i = 0; i < portaledZones.length; i++) {
-          const portaledZone = portaledZones[i]
-          const path =
-            bidirectional(portalGraph, 'Setent-Et-Nusum', portaledZone.name) ??
-            null
-          if (path) {
-            bidirectionalPaths.push(path)
-          }
-        }
-        // rebuild bidirectional paths to include the royal zones
-        const biDirectionalPathsExtended = []
-        for (let i = 0; i < bidirectionalPaths.length; i++) {
-          const bidirectionalPath = bidirectionalPaths[i]
-          const targetZone = bidirectionalPath[bidirectionalPath.length - 1]
-          const color = zones.find((z: any) => z.name === targetZone).color
-          let distance = bidirectionalPath.length - 1
-          let name = `Path to ${targetZone} :${color}_circle: (${
-            bidirectionalPath.length - 1
-          })`
-          if (
-            zones
-              .find((z: any) => z.name === targetZone)
-              .type.startsWith('OPENPVP_BLACK')
-          ) {
-            // this is a black zone, get the shortest path to bz portal
-            const shortestPathToRoyal = shortestPathToBzPortal[targetZone]
-            name = `Path to ${targetZone} :${color}_circle: (${
+          // rebuild bidirectional paths to include the royal zones
+          const biDirectionalPathsExtended = []
+          for (let i = 0; i < bidirectionalPaths.length; i++) {
+            const bidirectionalPath = bidirectionalPaths[i]
+            const targetZone = bidirectionalPath[bidirectionalPath.length - 1]
+            const color = zones.find((z: any) => z.name === targetZone).color
+            let distance = bidirectionalPath.length - 1
+            let name = `Path to ${targetZone} :${color}_circle: (${
               bidirectionalPath.length - 1
-            }, ${
-              shortestPathToRoyal.distance - 1
-            } to ${shortestPathToRoyal.to.join(', ')})`
-            distance += shortestPathToRoyal.distance - 1
+            })`
+            if (
+              zones
+                .find((z: any) => z.name === targetZone)
+                .type.startsWith('OPENPVP_BLACK')
+            ) {
+              // this is a black zone, get the shortest path to bz portal
+              const shortestPathToRoyal = shortestPathToBzPortal[targetZone]
+              name = `Path to ${targetZone} :${color}_circle: (${
+                bidirectionalPath.length - 1
+              }, ${
+                shortestPathToRoyal.distance - 1
+              } to ${shortestPathToRoyal.to.join(', ')})`
+              distance += shortestPathToRoyal.distance - 1
+            }
+            biDirectionalPathsExtended.push({
+              path: bidirectionalPath,
+              name: name,
+              distance: distance,
+              color: color,
+            })
           }
-          biDirectionalPathsExtended.push({
-            path: bidirectionalPath,
-            name: name,
-            distance: distance,
-            color: color,
-          })
-        }
-        const embed = new MessageEmbed().setTitle('Current royal/bz portals')
-        const biDirectionalPathsExtendedSorted =
-          biDirectionalPathsExtended.sort((a, b) => {
-            if (a.distance < b.distance) return -1
-            if (a.distance > b.distance) return 1
-            return 0
-          })
-        for (let i = 0; i < biDirectionalPathsExtendedSorted.length; i++) {
-          const bidirectionalPath = biDirectionalPathsExtendedSorted[i]
-          embed.addFields([
-            {
-              name: bidirectionalPath.name,
-              value: bidirectionalPath.path.join(' -> '),
-              inline: false,
-            },
-          ])
-        }
-        embed.setDescription(`Valid until: ${new Date(
-          validUntil
-        ).toUTCString()} | <t:${round(validUntil / 1000)}:R>
+          const embed = new MessageEmbed().setTitle('Current royal/bz portals')
+          const biDirectionalPathsExtendedSorted =
+            biDirectionalPathsExtended.sort((a, b) => {
+              if (a.distance < b.distance) return -1
+              if (a.distance > b.distance) return 1
+              return 0
+            })
+          for (let i = 0; i < biDirectionalPathsExtendedSorted.length; i++) {
+            const bidirectionalPath = biDirectionalPathsExtendedSorted[i]
+            embed.addFields([
+              {
+                name: bidirectionalPath.name,
+                value: bidirectionalPath.path.join(' -> '),
+                inline: false,
+              },
+            ])
+          }
+          embed.setDescription(`Valid until: ${new Date(
+            validUntil
+          ).toUTCString()} | <t:${round(validUntil / 1000)}:R>
 Posted at: ${new Date().toUTCString()} | <t:${round(Date.now() / 1000)}:R>`)
 
-        return interaction.reply({ embeds: [embed] })
+          const prevMessages: MessageManager = interaction.channel.messages
+          prevMessages
+            .fetch()
+            .then((messages) => {
+              messages.forEach((message: Message) => {
+                if (message.author.id === client.user?.id) {
+                  message.delete()
+                }
+              })
+            })
+            .catch((err: any) => {
+              logger.error(
+                "Couldn't fetch messages to delete old ones",
+                err.message
+              )
+            })
+
+          return interaction.reply({ embeds: [embed] })
+        }
       }
     }
-  })
+  )
 }
 
 export default initEvents
