@@ -39,8 +39,8 @@
   ],
   "devDependencies": {
     "@types/express-serve-static-core": "^4.17.31",
-    "@typescript-eslint/eslint-plugin": "^5.41.0",
-    "@typescript-eslint/parser": "^5.41.0",
+    "@typescript-eslint/eslint-plugin": "^6.0",
+    "@typescript-eslint/parser": "^6.0",
     "concurrently": "^7.5.0",
     "eslint": "8.22.0",
     "eslint-config-prettier": "^8.5.0",
@@ -54,6 +54,10 @@
     "prettier-eslint": "^15.0.1",
     "rimraf": "^3.0.2",
     "typescript": "^5.4.5"
+  },
+  "overrides": {
+    "@typescript-eslint/eslint-plugin": "^6.0",
+    "@typescript-eslint/parser": "^6.0"
   },
   "private": true
 }

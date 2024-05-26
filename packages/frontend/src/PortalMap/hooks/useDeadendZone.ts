@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { CytoEdgeData } from '../'
 import useGetPortals from '../../common/hooks/useGetPortals'
 import api from '../../api'
 import { ErrorActionTypes } from '../../reducers/errorReducer'
@@ -9,7 +8,6 @@ import { ZoneActionTypes } from '../../reducers/zoneReducer'
 import { Zone } from '@portaler/types'
 
 const useDeadendZone = () => {
-  const checkPortals = useGetPortals()
   const dispatch = useDispatch()
 
   const deadendZone = useCallback(
@@ -32,7 +30,7 @@ const useDeadendZone = () => {
         })
       }
     },
-    [checkPortals, dispatch]
+    [dispatch]
   )
 
   return deadendZone

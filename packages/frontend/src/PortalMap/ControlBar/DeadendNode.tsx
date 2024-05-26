@@ -30,7 +30,7 @@ const DeadendNode: FC<DeadendNodeProps> = ({ edgeData, zoneName }) => {
 
       setIsOpen(false)
     },
-    [deadendZone, edgeData]
+    [deadendZone, zoneName]
   )
 
   return edgeData.length > 0 ? (

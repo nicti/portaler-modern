@@ -16,9 +16,9 @@ interface ZoneSearchProps {
   label: string
   value: Zone
   update: (zone: Zone) => void
-  variant?: 'filled' | 'outlined' | 'standard'
-  error?: string | null
-  setFocus?: number
+  variant: 'filled' | 'outlined' | 'standard'
+  error: string | null
+  setFocus: number
 }
 
 const ZoneSearch: FC<ZoneSearchProps> = ({
