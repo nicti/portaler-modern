@@ -1,13 +1,9 @@
 import 'dotenv/config'
 
-import {
-  Client,
-  GatewayIntentBits,
-  REST,
-  Routes,
-  SlashCommandBuilder,
-  SlashCommandSubcommandBuilder,
-} from 'discord.js'
+import { Client, Intents } from 'discord.js'
+import { SlashCommandBuilder } from '@discordjs/builders'
+import { REST } from '@discordjs/rest'
+import { Routes } from 'discord-api-types/v9'
 
 import getDb from './db'
 import initEvents from './events'
@@ -15,9 +11,9 @@ import logger from './logger'
 
 const client = new Client({
   intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.GuildPresences,
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MEMBERS,
+    Intents.FLAGS.GUILD_PRESENCES,
   ],
 })
 
