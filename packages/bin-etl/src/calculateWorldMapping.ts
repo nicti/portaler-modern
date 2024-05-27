@@ -6,7 +6,7 @@ import { redis } from './db'
 const calculateWorldMapping = (fileData: FullZone[]) => {
   // bz mapping
   const bzGraph = new Graph()
-  const portalMap = new Map<string, string>()
+  const bzPortalMap = new Map<string, string>()
 
   const bzData = fileData.filter(
     (item) =>
@@ -20,7 +20,7 @@ const calculateWorldMapping = (fileData: FullZone[]) => {
     bzGraph.addNode(item.displayname)
     if (Array.isArray(item.exits?.exit)) {
       item.exits?.exit.forEach((exit) => {
-        portalMap.set(exit.id, item.displayname)
+        bzPortalMap.set(`${exit.id}@${item.id}`, item.displayname)
       })
     }
   })
@@ -28,7 +28,7 @@ const calculateWorldMapping = (fileData: FullZone[]) => {
   bzData.forEach((item: FullZone) => {
     if (Array.isArray(item.exits?.exit)) {
       item.exits?.exit.forEach((exit) => {
-        const target = portalMap.get(exit.targetid.split('@')[0])
+        const target = bzPortalMap.get(exit.targetid)
         if (target === undefined) {
           return
         }
@@ -86,7 +86,99 @@ const calculateWorldMapping = (fileData: FullZone[]) => {
       portals: shortest,
     }
   })
-  redis.setShortestPaths(bzToPortals)
+
+  // royal cities mapping
+  const rcGraph = new Graph()
+  const rcPortalMap = new Map<string, string>()
+  const rcCity = [
+    'Bridgewatch',
+    'Fort Sterling',
+    'Lymhurst',
+    'Martlock',
+    'Thetford',
+    'Caerleon',
+  ]
+
+  const rcData = fileData.filter(
+    (item) =>
+      item.enabled === 'true' &&
+      (item.type === 'SAFEAREA' ||
+        item.type === 'OPENPVP_YELLOW' ||
+        item.type === 'OPENPVP_RED' ||
+        rcCity.includes(item.displayname))
+  )
+  rcData.forEach((item: FullZone) => {
+    rcGraph.addNode(item.displayname)
+    if (Array.isArray(item.exits?.exit)) {
+      item.exits?.exit.forEach((exit) => {
+        rcPortalMap.set(`${exit.id}@${item.id}`, item.displayname)
+      })
+    }
+  })
+  rcData.forEach((item: FullZone) => {
+    if (Array.isArray(item.exits?.exit)) {
+      item.exits?.exit.forEach((exit) => {
+        const target = rcPortalMap.get(exit.targetid)
+        if (target === undefined) {
+          return
+        }
+        try {
+          rcGraph.addEdge(item.displayname, target)
+        } catch (UsageGraphError) {}
+      })
+    }
+  })
+  const rcToCitys: any = {}
+  rcData.forEach((zone: FullZone) => {
+    let shortest: string[][] = []
+    const bridgewatch =
+      bidirectional(rcGraph, zone.displayname, 'Bridgewatch') ?? []
+    shortest.push(bridgewatch)
+    let shortNum: number = shortest[0].length
+    const fortSterling =
+      bidirectional(rcGraph, zone.displayname, 'Fort Sterling') ?? []
+    if (fortSterling.length < shortNum) {
+      shortest = [fortSterling]
+      shortNum = fortSterling.length
+    } else if (fortSterling.length === shortNum) {
+      shortest.push(fortSterling)
+    }
+    const lymhurst = bidirectional(rcGraph, zone.displayname, 'Lymhurst') ?? []
+    if (lymhurst.length < shortNum) {
+      shortest = [lymhurst]
+      shortNum = lymhurst.length
+    } else if (lymhurst.length === shortNum) {
+      shortest.push(lymhurst)
+    }
+    const martlock = bidirectional(rcGraph, zone.displayname, 'Martlock') ?? []
+    if (martlock.length < shortNum) {
+      shortest = [martlock]
+      shortNum = martlock.length
+    } else if (martlock.length === shortNum) {
+      shortest.push(martlock)
+    }
+    const thetford = bidirectional(rcGraph, zone.displayname, 'Thetford') ?? []
+    if (thetford.length < shortNum) {
+      shortest = [thetford]
+      shortNum = thetford.length
+    } else if (thetford.length === shortNum) {
+      shortest.push(thetford)
+    }
+    const caerleon = bidirectional(rcGraph, zone.displayname, 'Caerleon') ?? []
+    if (caerleon.length < shortNum) {
+      shortest = [caerleon]
+      shortNum = caerleon.length
+    } else if (caerleon.length === shortNum) {
+      shortest.push(caerleon)
+    }
+    rcToCitys[zone.displayname] = {
+      to: shortest.map((i) => i[i.length - 1]),
+      distance: shortNum,
+      portals: shortest,
+    }
+  })
+
+  redis.setShortestPaths({ ...bzToPortals, ...rcToCitys })
 }
 
 export default calculateWorldMapping

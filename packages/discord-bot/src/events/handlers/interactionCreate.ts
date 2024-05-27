@@ -31,7 +31,10 @@ const interactionCreate = async (client: Client, interaction: any) => {
           ephemeral: true,
         })
       }
-      const embed = buildRoutesEmbed(biDirectionalPathsExtended, validUntil)
+      const embed = await buildRoutesEmbed(
+        biDirectionalPathsExtended,
+        validUntil
+      )
       const prevMessages: MessageManager = interaction.channel.messages
       prevMessages
         .fetch()

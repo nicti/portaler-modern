@@ -218,7 +218,12 @@ const PortalMap = () => {
           let label: string = ''
           if (z.type.startsWith('TUNNEL')) {
             label = `${z.name} (${callSign(z)})`
-          } else if (z.type.startsWith('OPENPVP_BLACK')) {
+          } else if (
+            z.type.startsWith('OPENPVP_BLACK') ||
+            z.type.startsWith('OPENPVP_RED') ||
+            z.type.startsWith('OPENPVP_YELLOW') ||
+            z.type.startsWith('SAFEAREA')
+          ) {
             label = `${z.name} (${z.shortestPaths.distance - 1})`
           } else {
             label = z.name

@@ -62,10 +62,12 @@ const getRoutes = async (
     let name = `Path to ${targetZone} :${color}_circle: (${
       bidirectionalPath.length - 1
     })`
+    const zone = zones.find((z: any) => z.name === targetZone)
     if (
-      zones
-        .find((z: any) => z.name === targetZone)
-        .type.startsWith('OPENPVP_BLACK')
+      zone.type.startsWith('OPENPVP_BLACK') ||
+      zone.type.startsWith('OPENPVP_RED') ||
+      zone.type.startsWith('OPENPVP_YELLOW') ||
+      zone.type.startsWith('SAFEAREA')
     ) {
       // this is a black zone, get the shortest path to bz portal
       const shortestPathToRoyal = shortestPathToBzPortal[targetZone]

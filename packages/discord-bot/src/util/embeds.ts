@@ -35,6 +35,9 @@ const buildRoutesEmbed = async (
     validUntil / 1000
   )}:R>
 Posted at:  ${formatDate(dateNow)} | <t:${round(Date.now() / 1000)}:R>`)
+  embed.setFooter({
+    text: 'Excluding underways and tunnels',
+  })
   return embed
 }
 
