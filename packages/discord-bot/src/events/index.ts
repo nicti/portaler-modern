@@ -50,9 +50,15 @@ const initEvents = (client: Client) => {
 
     for (let i = 0; i < allowedChannels.length; i++) {
       const id: string = allowedChannels[i]
-      const channel: TextChannel = (await client.channels.fetch(
-        id
-      )) as TextChannel
+      let channel: TextChannel | null = null
+      try {
+        channel = (await client.channels.fetch(id)) as TextChannel
+      } catch (DiscordAPIError) {
+        console.error(
+          `Channel with id ${id} does not exist or bot does not have access to it`
+        )
+        continue
+      }
       const messages: Collection<Snowflake, Message> =
         await channel.messages.fetch()
       messages.forEach(async (message: Message): Promise<void> => {
