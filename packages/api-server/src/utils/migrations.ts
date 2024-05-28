@@ -5,9 +5,9 @@ import logger from './logger'
 import { db } from './db'
 
 const migrations = async () => {
-  const discord_server_id = (
+  const discord_server_ids = (
     process.env.DISCORD_SERVER_ID as unknown as string
-  ).split(',')[0]
+  ).split(',')
   try {
     await createDb(config.db.database, {
       ...config.db,
@@ -18,10 +18,13 @@ const migrations = async () => {
   } catch (err: any) {
     logger.error('Error populating servers', { error: err })
   }
-  try {
-    await db.Server.create(discord_server_id)
-  } catch (err: any) {
-    logger.info('Server <' + discord_server_id + '> already exists in db')
+  for (let i = 0; i < discord_server_ids.length; i++) {
+    const discord_server_id = discord_server_ids[i]
+    try {
+      await db.Server.create(discord_server_id)
+    } catch (err: any) {
+      logger.info('Server <' + discord_server_id + '> already exists in db')
+    }
   }
 }
 
