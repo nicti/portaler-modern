@@ -3,9 +3,12 @@ import { round } from 'lodash'
 import exp from 'node:constants'
 
 const formatDate = (date: Date) =>
-  `${date.getUTCDate()}/${
-    date.getUTCMonth() + 1
-  }/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()} UTC`
+  `${date.getUTCDate().toString().padStart(2, '0')}/${
+    date.getUTCMonth().toString().padStart(2, '0') + 1
+  }/${date.getUTCFullYear()} ${date
+    .getUTCHours()
+    .toString()
+    .padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')} UTC`
 
 const buildRoutesEmbed = async (
   biDirectionalPathsExtended: any[],
