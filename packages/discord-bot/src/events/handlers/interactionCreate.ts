@@ -1,12 +1,20 @@
-import { Client, Message, MessageEmbed, MessageManager } from 'discord.js'
+import {
+  Client,
+  CommandInteraction,
+  Message,
+  MessageEmbed,
+  MessageManager,
+} from 'discord.js'
 
 import logger from '../../logger'
 import { round } from 'lodash'
 import getRoutes from '../../util/routes'
 import buildRoutesEmbed from '../../util/embeds'
 
-
-const interactionCreate = async (client: Client, interaction: any) => {
+const interactionCreate = async (
+  client: Client,
+  interaction: CommandInteraction | any
+) => {
   if (!interaction.isCommand()) return
   if (
     !(process.env.DISCORD_ALLOWED_CHANNEL_IDS as string)
@@ -35,12 +43,20 @@ const interactionCreate = async (client: Client, interaction: any) => {
         biDirectionalPathsExtended,
         validUntil
       )
+      const msgResponse = await interaction.reply({
+        embeds: [embed],
+        fetchReply: true,
+      })
+
       const prevMessages: MessageManager = interaction.channel.messages
       prevMessages
         .fetch()
         .then((messages) => {
           messages.forEach((message: Message) => {
-            if (message.author.id === client.user?.id) {
+            if (
+              message.author.id === client.user?.id &&
+              msgResponse.id !== message.id
+            ) {
               message.delete()
             }
           })
@@ -52,7 +68,7 @@ const interactionCreate = async (client: Client, interaction: any) => {
           )
         })
 
-      return interaction.reply({ embeds: [embed] })
+      return
     }
   }
 }

@@ -40,7 +40,7 @@ const initEvents = (client: Client) => {
   )
 
   // setup interval for updating embeds
-  setInterval(async () => {
+  const updateEmbeds = async () => {
     const allowedChannels: string[] = (
       process.env.DISCORD_ALLOWED_CHANNEL_IDS as string
     ).split(',')
@@ -80,7 +80,10 @@ const initEvents = (client: Client) => {
         }
       })
     }
-  }, fiveMinutes)
+  }
+  // Initial run and interval every 5 minutes
+  updateEmbeds()
+  setInterval(updateEmbeds, fiveMinutes)
 }
 
 export default initEvents
