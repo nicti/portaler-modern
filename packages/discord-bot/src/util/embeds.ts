@@ -32,12 +32,17 @@ const buildRoutesEmbed = async (
       },
     ])
   }
+  let descriptionPostfix = ''
+  if (biDirectionalPathsExtendedSorted.length === 0) {
+    descriptionPostfix = 'Get mapping! No info available at the moment.'
+  }
   const validUntilDate = new Date(validUntil)
   const dateNow = new Date()
   embed.setDescription(`Valid until: ${formatDate(validUntilDate)} | <t:${round(
     validUntil / 1000
   )}:R>
-Posted at:  ${formatDate(dateNow)} | <t:${round(Date.now() / 1000)}:R>`)
+Posted at:  ${formatDate(dateNow)} | <t:${round(Date.now() / 1000)}:R>
+${descriptionPostfix}`)
   embed.setFooter({
     text: 'Excluding underways and tunnels',
   })
