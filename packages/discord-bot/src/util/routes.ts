@@ -46,8 +46,13 @@ const getRoutes = async (
   const bidirectionalPaths = []
   for (let i = 0; i < portaledZones.length; i++) {
     const portaledZone = portaledZones[i]
-    const path =
-      bidirectional(portalGraph, 'Setent-Et-Nusum', portaledZone.name) ?? null
+    let path = null
+    try {
+      path =
+        bidirectional(portalGraph, 'Setent-Et-Nusum', portaledZone.name) ?? null
+    } catch (GraphError) {
+      continue
+    }
     if (path) {
       bidirectionalPaths.push(path)
     }
