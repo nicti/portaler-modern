@@ -2,6 +2,7 @@ import {
   Client,
   CommandInteraction,
   Message,
+  MessageAttachment,
   MessageEmbed,
   MessageManager,
 } from 'discord.js'
@@ -10,6 +11,7 @@ import logger from '../../logger'
 import { round } from 'lodash'
 import getRoutes from '../../util/routes'
 import buildRoutesEmbed from '../../util/embeds'
+import getMapImage from '../../util/cytosnap'
 
 const interactionCreate = async (
   client: Client,
@@ -39,35 +41,51 @@ const interactionCreate = async (
           ephemeral: true,
         })
       }
+      const image = await getMapImage(biDirectionalPathsExtended)
       const embed = await buildRoutesEmbed(
         biDirectionalPathsExtended,
-        validUntil
+        validUntil,
+        image
       )
-      const msgResponse = await interaction.reply({
-        embeds: [embed],
-        fetchReply: true,
-      })
-
-      const prevMessages: MessageManager = interaction.channel.messages
-      prevMessages
-        .fetch()
-        .then((messages) => {
-          messages.forEach((message: Message) => {
-            if (
-              message.author.id === client.user?.id &&
-              msgResponse.id !== message.id
-            ) {
-              message.delete()
-            }
+      let file: MessageAttachment | null = null
+      if (image) {
+        file = new MessageAttachment(image, 'map.png')
+      }
+      let msgResponse: Message | null = null
+      if (file) {
+        msgResponse = await interaction.reply({
+          embeds: [embed],
+          files: [file],
+          fetchReply: true,
+        })
+      } else {
+        msgResponse = await interaction.reply({
+          embeds: [embed],
+          fetchReply: true,
+        })
+      }
+      if (msgResponse !== null) {
+        const prevMessages: MessageManager = interaction.channel.messages
+        prevMessages
+          .fetch()
+          .then((messages) => {
+            messages.forEach((message: Message) => {
+              if (
+                message.author.id === client.user?.id &&
+                msgResponse !== null &&
+                msgResponse.id !== message.id
+              ) {
+                message.delete()
+              }
+            })
           })
-        })
-        .catch((err: any) => {
-          logger.error(
-            "Couldn't fetch messages to delete old ones",
-            err.message
-          )
-        })
-
+          .catch((err: any) => {
+            logger.error(
+              "Couldn't fetch messages to delete old ones",
+              err.message
+            )
+          })
+      }
       return
     }
   }

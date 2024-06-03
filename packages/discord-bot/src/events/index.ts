@@ -3,7 +3,7 @@ import {
   Collection,
   Guild,
   GuildMember,
-  Message,
+  Message, MessageAttachment,
   PartialGuildMember,
   Snowflake,
   TextChannel,
@@ -14,6 +14,7 @@ import removeServer from './handlers/deleteServerRole'
 import interactionCreate from './handlers/interactionCreate'
 import getRoutes from '../util/routes'
 import buildRoutesEmbed from '../util/embeds'
+import getMapImage from '../util/cytosnap'
 
 const fiveMinutes: number = 1000 * 60 * 5
 
@@ -26,17 +27,17 @@ const initEvents = (client: Client) => {
 
   // when members get updated
   client.on('guildMemberUpdate', (_, member: GuildMember) =>
-    roleHandler(member)
+    roleHandler(member),
   )
 
   // when a member leaves a server
   client.on('guildMemberRemove', (member: GuildMember | PartialGuildMember) =>
-    removeUser(member)
+    removeUser(member),
   )
 
   // Slash command handler
   client.on('interactionCreate', (interaction: any) =>
-    interactionCreate(client, interaction)
+    interactionCreate(client, interaction),
   )
 
   // setup interval for updating embeds
@@ -55,7 +56,7 @@ const initEvents = (client: Client) => {
         channel = (await client.channels.fetch(id)) as TextChannel
       } catch (DiscordAPIError) {
         console.error(
-          `Channel with id ${id} does not exist or bot does not have access to it`
+          `Channel with id ${id} does not exist or bot does not have access to it`,
         )
         continue
       }
@@ -66,16 +67,26 @@ const initEvents = (client: Client) => {
           // this is my embed, update it
           if (message.embeds[0].title === 'Current royal/bz portals') {
             const [biDirectionalPathsExtended, validUntil] = await getRoutes(
-              mainGuildId
+              mainGuildId,
             )
             if (biDirectionalPathsExtended === null || validUntil === null) {
               return
             }
+            const image = await getMapImage(biDirectionalPathsExtended)
             const embed = await buildRoutesEmbed(
               biDirectionalPathsExtended,
-              validUntil
+              validUntil,
+              image
             )
-            message.edit({ embeds: [embed] })
+            let file: MessageAttachment | null = null
+            if (image) {
+              file = new MessageAttachment(image, 'map.png')
+            }
+            if (file) {
+              message.edit({ embeds: [embed], files: [file] })
+            } else {
+              message.edit({ embeds: [embed] })
+            }
           }
         }
       })

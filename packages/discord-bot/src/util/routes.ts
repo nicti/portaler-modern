@@ -49,7 +49,8 @@ const getRoutes = async (
     let path = null
     try {
       path =
-        bidirectional(portalGraph, 'Setent-Et-Nusum', portaledZone.name) ?? null
+        bidirectional(portalGraph, process.env.HOME_ZONE, portaledZone.name) ??
+        null
     } catch (GraphError) {
       continue
     }
