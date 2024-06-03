@@ -137,7 +137,9 @@ const getMapImage = async (
   } else {
     const zone = zones.find((z: any) => z.name === process.env.HOME_ZONE)
     const label = `${process.env.HOME_ZONE}`
-    const backgroundUrl = `url(./tiers/${zone.tier.toLowerCase()}.png)`
+    const backgroundUrl = zone.tier
+      ? `url(./tiers/${zone.tier.toLowerCase()}.png)`
+      : 'none'
     elements.push({
       data: {
         id: process.env.HOME_ZONE,
