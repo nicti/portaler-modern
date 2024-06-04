@@ -167,7 +167,7 @@ const getMapImage = async (
     args: ['--no-sandbox', '--disable-gpu', '--disable-web-security'],
   })
   await snap.start()
-  return await snap.shot({
+  const img = await snap.shot({
     elements: elements,
     pan: { x: 0, y: 0 },
     minZoom: 0.05,
@@ -231,6 +231,8 @@ const getMapImage = async (
     height: 1000,
     background: '#333',
   })
+  await snap.stop()
+  return img
 }
 
 export default getMapImage
