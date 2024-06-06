@@ -13,7 +13,7 @@ const formatDate = (date: Date) =>
 const buildRoutesEmbed = async (
   biDirectionalPathsExtended: any[],
   validUntil: number,
-  image: any | null = null
+  image: string | null = null
 ) => {
   const embed = new MessageEmbed().setTitle('Current royal/bz portals')
   const biDirectionalPathsExtendedSorted = biDirectionalPathsExtended.sort(

@@ -3,12 +3,10 @@ import {
   CommandInteraction,
   Message,
   MessageAttachment,
-  MessageEmbed,
   MessageManager,
 } from 'discord.js'
 
 import logger from '../../logger'
-import { round } from 'lodash'
 import getRoutes from '../../util/routes'
 import buildRoutesEmbed from '../../util/embeds'
 import getMapImage from '../../util/cytosnap'
@@ -49,7 +47,8 @@ const interactionCreate = async (
       )
       let file: MessageAttachment | null = null
       if (image) {
-        file = new MessageAttachment(image, 'map.png')
+        const sfbuff: any = Buffer.from(image.split(',')[1], 'base64')
+        file = new MessageAttachment(sfbuff, 'map.png')
       }
       let msgResponse: Message | null = null
       if (file) {

@@ -1,6 +1,8 @@
 import cytosnap from 'cytosnap'
 import { db, redis } from '../db'
+import hash from 'object-hash'
 import { Zone } from '@portaler/types'
+
 cytosnap.use(['cytoscape-fcose'])
 
 const portalSizeToColor: any = {
@@ -61,7 +63,7 @@ const getShape = (zone: Zone): string => {
 
 const getMapImage = async (
   biDirectionalPathsExtended: any[]
-): Promise<any | null> => {
+): Promise<string | null> => {
   const elements: any[] = []
   const zones = JSON.parse(await redis.getZones())
   const mainGuildId = (process.env.DISCORD_GUILD_ID as string).split(',')[0]
@@ -162,6 +164,16 @@ const getMapImage = async (
       },
     })
   }
+  // Generate object hash
+  const elementHash = hash(elements)
+  // Verify if the images is equal to the previous one
+  const previousImage: { hash: string; image: string } = JSON.parse(
+    await redis.getMapImage(serverId)
+  )
+  if (previousImage && previousImage.hash === elementHash) {
+    return previousImage.image
+  }
+
   const snap = cytosnap({
     headless: true,
     args: ['--no-sandbox', '--disable-gpu', '--disable-web-security'],
@@ -225,13 +237,14 @@ const getMapImage = async (
         },
       },
     ],
-    resolvesTo: 'stream',
+    resolvesTo: 'base64uri',
     format: 'png',
     width: 1500,
     height: 1000,
     background: '#333',
   })
   await snap.stop()
+  await redis.setMapImage(elementHash, img, serverId)
   return img
 }
 

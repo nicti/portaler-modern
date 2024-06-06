@@ -12,7 +12,7 @@ export default class RedisConnector {
     key: string,
     value: string,
     mode?: ExpireTimes,
-    expires?: number
+    expires?: number,
   ) => Promise<any>
   delAsync: (key: string) => Promise<any>
 
@@ -53,7 +53,7 @@ export default class RedisConnector {
 
   delServer = async (serverId: number, userIds: number[]) => {
     const tokenList = await Promise.all(
-      userIds.map((uid) => this.getToken(uid, serverId))
+      userIds.map((uid) => this.getToken(uid, serverId)),
     )
 
     const delTokens = tokenList.map((t) => this.delAsync(t))
@@ -81,4 +81,19 @@ export default class RedisConnector {
     await this.setAsync(`zone:${zone.id}`, JSON.stringify(zone), 'EX', 7200)
 
   getZone = async (id: number) => await this.getAsync(`zone:${id}`)
+
+  setMapImage = async (
+    elementHash: string,
+    mapImage: string,
+    serverId: string | number
+  ) => {
+    await this.delAsync(`map:${serverId}`)
+    await this.setAsync(
+      `map:${serverId}`,
+      JSON.stringify({ hash: elementHash, image: mapImage }),
+    )
+  }
+
+  getMapImage = async (serverId: string | number): Promise<string> =>
+    await this.getAsync(`map:${serverId}`)
 }

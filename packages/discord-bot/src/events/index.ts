@@ -3,7 +3,8 @@ import {
   Collection,
   Guild,
   GuildMember,
-  Message, MessageAttachment,
+  Message,
+  MessageAttachment,
   PartialGuildMember,
   Snowflake,
   TextChannel,
@@ -27,17 +28,17 @@ const initEvents = (client: Client) => {
 
   // when members get updated
   client.on('guildMemberUpdate', (_, member: GuildMember) =>
-    roleHandler(member),
+    roleHandler(member)
   )
 
   // when a member leaves a server
   client.on('guildMemberRemove', (member: GuildMember | PartialGuildMember) =>
-    removeUser(member),
+    removeUser(member)
   )
 
   // Slash command handler
   client.on('interactionCreate', (interaction: any) =>
-    interactionCreate(client, interaction),
+    interactionCreate(client, interaction)
   )
 
   // setup interval for updating embeds
@@ -56,23 +57,26 @@ const initEvents = (client: Client) => {
         channel = (await client.channels.fetch(id)) as TextChannel
       } catch (DiscordAPIError) {
         console.error(
-          `Channel with id ${id} does not exist or bot does not have access to it`,
+          `Channel with id ${id} does not exist or bot does not have access to it`
         )
         continue
       }
       const messages: Collection<Snowflake, Message> =
         await channel.messages.fetch()
-      messages.forEach(async (message: Message): Promise<void> => {
+      const messagesArray: Message[] = messages.map((m) => m)
+      for (const message of messagesArray) {
         if (message.author.id === client.user?.id) {
           // this is my embed, update it
           if (message.embeds[0].title === 'Current royal/bz portals') {
             const [biDirectionalPathsExtended, validUntil] = await getRoutes(
-              mainGuildId,
+              mainGuildId
             )
             if (biDirectionalPathsExtended === null || validUntil === null) {
-              return
+              continue
             }
-            const image = await getMapImage(biDirectionalPathsExtended)
+            const image: string | null = await getMapImage(
+              biDirectionalPathsExtended
+            )
             const embed = await buildRoutesEmbed(
               biDirectionalPathsExtended,
               validUntil,
@@ -80,7 +84,8 @@ const initEvents = (client: Client) => {
             )
             let file: MessageAttachment | null = null
             if (image) {
-              file = new MessageAttachment(image, 'map.png')
+              const sfbuff: any = Buffer.from(image.split(',')[1], 'base64')
+              file = new MessageAttachment(sfbuff, 'map.png')
             }
             if (file) {
               message.edit({ embeds: [embed], files: [file] })
@@ -89,7 +94,7 @@ const initEvents = (client: Client) => {
             }
           }
         }
-      })
+      }
     }
   }
   // Initial run and interval every 5 minutes
