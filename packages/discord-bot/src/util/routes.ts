@@ -21,7 +21,9 @@ const getRoutes = async (
       (portal: any) =>
         !zone.type.startsWith('TUNNEL_') &&
         portal.size !== 'const' &&
-        portal.size !== 'royal' &&
+        (portal.size !== 'royal' ||
+          portal.conn1 === 'Brecilien' ||
+          portal.conn2 === 'Brecilien') &&
         (portal.conn1 === zone.name || portal.conn2 === zone.name)
     )
   )
@@ -29,7 +31,12 @@ const getRoutes = async (
   const portalGraph: Graph = new Graph({ type: 'undirected' })
   for (let i = 0; i < portals.length; i++) {
     const portal = portals[i]
-    if (portal.size === 'const' || portal.size === 'royal') continue
+    if (
+      portal.size === 'const' ||
+      (portal.size === 'royal' &&
+        !(portal.conn1 === 'Brecilien' || portal.conn2 === 'Brecilien'))
+    )
+      continue
     if (!portalGraph.hasNode(portal.conn1)) {
       portalGraph.addNode(portal.conn1)
     }
@@ -63,12 +70,15 @@ const getRoutes = async (
   for (let i = 0; i < bidirectionalPaths.length; i++) {
     const bidirectionalPath = bidirectionalPaths[i]
     const targetZone = bidirectionalPath[bidirectionalPath.length - 1]
-    const color = zones.find((z: any) => z.name === targetZone).color
+    let color = zones.find((z: any) => z.name === targetZone).color
+    if (color === 'city-black') color = ':homes:'
+    else color = `:${color}_circle:`
     let distance = bidirectionalPath.length - 1
-    let name = `Path to ${targetZone} :${color}_circle: (${
+    let name = `Path to ${targetZone} ${color} (${
       bidirectionalPath.length - 1
     })`
     const zone = zones.find((z: any) => z.name === targetZone)
+    let zDistance = 0
     if (
       zone.type.startsWith('OPENPVP_BLACK') ||
       zone.type.startsWith('OPENPVP_RED') ||
@@ -77,17 +87,19 @@ const getRoutes = async (
     ) {
       // this is a black zone, get the shortest path to bz portal
       const shortestPathToRoyal = shortestPathToBzPortal[targetZone]
-      name = `Path to ${targetZone} :${color}_circle: (${
+      name = `Path to ${targetZone} ${color} (${
         bidirectionalPath.length - 1
       }, ${shortestPathToRoyal.distance - 1} to ${shortestPathToRoyal.to.join(
         ', '
       )})`
       distance += shortestPathToRoyal.distance - 1
+      zDistance = shortestPathToRoyal.distance
     }
     biDirectionalPathsExtended.push({
       path: bidirectionalPath,
       name: name,
       distance: distance,
+      zDistance: zDistance,
       color: color,
     })
   }

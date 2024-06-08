@@ -15,7 +15,7 @@ const portalSizeToColor: any = {
 const getZoneColor = (
   type: string,
   isHome: boolean,
-  isDeep: boolean = false
+  isDeep: boolean = false,
 ): string => {
   if (isHome) {
     return '#aa00ff'
@@ -62,7 +62,7 @@ const getShape = (zone: Zone): string => {
 }
 
 const getMapImage = async (
-  biDirectionalPathsExtended: any[]
+  biDirectionalPathsExtended: any[],
 ): Promise<string | null> => {
   const elements: any[] = []
   const zones = JSON.parse(await redis.getZones())
@@ -80,13 +80,14 @@ const getMapImage = async (
         path: string[]
         name: string
         distance: number
+        zDistance: number
         color: string
       }) => {
         for (let i = 0; i <= d.path.length - 1; i++) {
           const zone = zones.find((z: any) => z.name === d.path[i])
           let label = ''
-          if (['red', 'yellow', 'blue', 'black'].includes(zone.color)) {
-            label = `${d.path[i]} (${d.distance - 1})`
+          if (['red', 'yellow', 'blue', 'black'].includes(zone.color) && d.zDistance !== 0) {
+            label = `${d.path[i]} (${d.zDistance - 1})`
           } else {
             label = `${d.path[i]}`
           }
@@ -99,7 +100,7 @@ const getMapImage = async (
             css: {
               backgroundColor: getZoneColor(
                 zone.color,
-                zone.name === process.env.HOME_ZONE
+                zone.name === process.env.HOME_ZONE,
               ),
               shape: getShape(zone),
               width: 30,
@@ -117,7 +118,7 @@ const getMapImage = async (
             const portal = dbPortals.find(
               (p: any) =>
                 (p.conn1 === d.path[i] && p.conn2 === d.path[i - 1]) ||
-                (p.conn1 === d.path[i - 1] && p.conn2 === d.path[i])
+                (p.conn1 === d.path[i - 1] && p.conn2 === d.path[i]),
             )
             elements.push({
               data: {
@@ -134,7 +135,7 @@ const getMapImage = async (
             })
           }
         }
-      }
+      },
     )
   } else {
     const zone = zones.find((z: any) => z.name === process.env.HOME_ZONE)
@@ -149,7 +150,7 @@ const getMapImage = async (
       css: {
         backgroundColor: getZoneColor(
           zone.color,
-          zone.name === process.env.HOME_ZONE
+          zone.name === process.env.HOME_ZONE,
         ),
         shape: getShape(zone),
         width: 30,
@@ -168,7 +169,7 @@ const getMapImage = async (
   const elementHash = hash(elements)
   // Verify if the images is equal to the previous one
   const previousImage: { hash: string; image: string } = JSON.parse(
-    await redis.getMapImage(serverId)
+    await redis.getMapImage(serverId),
   )
   if (previousImage && previousImage.hash === elementHash) {
     return previousImage.image
