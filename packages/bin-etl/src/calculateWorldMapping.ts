@@ -12,7 +12,8 @@ const calculateWorldMapping = (fileData: FullZone[]) => {
     (item) =>
       item.enabled === 'true' &&
       (item.type.startsWith('OPENPVP_BLACK') ||
-        item.type.startsWith('PLAYERCITY_BLACK_PORTALCITY_NOFURNITURE'))
+        item.type.startsWith('PLAYERCITY_BLACK_PORTALCITY_NOFURNITURE') ||
+        item.type === 'PLAYERCITY_BLACK')
   )
   // bz nodes
   bzData.forEach((item: FullZone) => {
@@ -39,46 +40,38 @@ const calculateWorldMapping = (fileData: FullZone[]) => {
       })
     }
   })
+  const outlandsSafeZones = [
+    'Bridgewatch Portal',
+    'Fort Sterling Portal',
+    'Lymhurst Portal',
+    'Martlock Portal',
+    'Thetford Portal',
+    "Arthur's Rest",
+    "Morgana's Rest",
+    "Merlyn's Rest",
+    'Sunfang Dawn',
+  ]
   // bz to portals storage
   const bzToPortals: any = {}
   // bz to portals calculation
   bzData.forEach((zone: FullZone) => {
     let shortest: string[][] = []
-    const bridgewatch =
-      bidirectional(bzGraph, zone.displayname, 'Bridgewatch Portal') ?? []
-    shortest.push(bridgewatch)
-    let shortNum: number = shortest[0].length
-    const fortSterling =
-      bidirectional(bzGraph, zone.displayname, 'Fort Sterling Portal') ?? []
-    if (fortSterling.length < shortNum) {
-      shortest = [fortSterling]
-      shortNum = fortSterling.length
-    } else if (fortSterling.length === shortNum) {
-      shortest.push(fortSterling)
-    }
-    const lymhurst =
-      bidirectional(bzGraph, zone.displayname, 'Lymhurst Portal') ?? []
-    if (lymhurst.length < shortNum) {
-      shortest = [lymhurst]
-      shortNum = lymhurst.length
-    } else if (lymhurst.length === shortNum) {
-      shortest.push(lymhurst)
-    }
-    const martlock =
-      bidirectional(bzGraph, zone.displayname, 'Martlock Portal') ?? []
-    if (martlock.length < shortNum) {
-      shortest = [martlock]
-      shortNum = martlock.length
-    } else if (martlock.length === shortNum) {
-      shortest.push(martlock)
-    }
-    const thetford =
-      bidirectional(bzGraph, zone.displayname, 'Thetford Portal') ?? []
-    if (thetford.length < shortNum) {
-      shortest = [thetford]
-      shortNum = thetford.length
-    } else if (thetford.length === shortNum) {
-      shortest.push(thetford)
+    let shortNum: number = Infinity
+    for (let i = 0; i < outlandsSafeZones.length; i++) {
+      const safeZone = outlandsSafeZones[i]
+      const safeZonePath =
+        bidirectional(bzGraph, zone.displayname, safeZone) ?? []
+      if (shortest.length === 0) {
+        shortest.push(safeZonePath)
+        shortNum = safeZonePath.length
+        continue
+      }
+      if (safeZonePath.length < shortNum) {
+        shortest = [safeZonePath]
+        shortNum = safeZonePath.length
+      } else if (safeZonePath.length === shortNum) {
+        shortest.push(safeZonePath)
+      }
     }
     bzToPortals[zone.displayname] = {
       to: shortest.map((i) => i[i.length - 1]),
